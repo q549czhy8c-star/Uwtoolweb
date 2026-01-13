@@ -3770,7 +3770,7 @@ const [addressProofType, setAddressProofType] = useState('');
                 const existing = parseFloat(hnwExistingCoverage) || 0;
                 const totalSa = sa + existing;
                 // Find group info from COUNTRY_GROUP_DATA
-                const groupData = COUNTRY_GROUP_DATA.find(c => c.name === hnwResidency) || {};
+                const groupData = COUNTRY_GROUP_DATA.find(c => c.country === hnwResidency) || {};
                 const groupLabel = groupData.group ? `Group ${groupData.group}` : '';
                 const summaryLines = [];
                 summaryLines.push(`Applying LionMaster USD ${hnwSumAssured || ''} - ${hnwClass || ''} - ${hnwTerm || ''} (${hnwAnnualPremium || ''})`);
@@ -6923,7 +6923,153 @@ const App = () => {
 
                     
 
-                    {/* Export Options Modal (Hybrid Mode) */}
+                    {
+                    {/* HNW LionMaster Input Modal */}
+                    {isHnwModalOpen && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+                            <div className="w-full max-w-3xl bg-white rounded-xl shadow-xl border border-slate-200 overflow-hidden">
+                                <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200">
+                                    <div className="font-semibold text-slate-800">LionMaster (HNW) - Additional Input</div>
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsHnwModalOpen(false)}
+                                        className="text-xs bg-slate-100 border border-slate-200 px-3 py-2 rounded hover:bg-slate-200 transition-colors"
+                                    >
+                                        Close
+                                    </button>
+                                </div>
+
+                                <div className="p-4 max-h-[75vh] overflow-y-auto space-y-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                        <div>
+                                            <label className="text-[10px] text-slate-500 font-bold">Signing date</label>
+                                            <input type="date" value={hnwSignDate} onChange={(e) => setHnwSignDate(e.target.value)} className="w-full border rounded p-1.5 text-sm"/>
+                                        </div>
+                                        <div>
+                                            <label className="text-[10px] text-slate-500 font-bold">DOB</label>
+                                            <input type="date" value={hnwDOB} onChange={(e) => setHnwDOB(e.target.value)} className="w-full border rounded p-1.5 text-sm"/>
+                                        </div>
+                                        <div>
+                                            <label className="text-[10px] text-slate-500 font-bold">Age (auto)</label>
+                                            <input type="text" value={hnwAge} readOnly className="w-full border rounded p-1.5 text-sm bg-slate-50"/>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                        <div>
+                                            <label className="text-[10px] text-slate-500 font-bold">Gender</label>
+                                            <select value={hnwGender} onChange={(e) => setHnwGender(e.target.value)} className="w-full border rounded p-1.5 text-sm">
+                                                <option value="M">M</option>
+                                                <option value="F">F</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="text-[10px] text-slate-500 font-bold">Smoking</label>
+                                            <select value={hnwSmoking} onChange={(e) => setHnwSmoking(e.target.value)} className="w-full border rounded p-1.5 text-sm">
+                                                <option value="">Please select</option>
+                                                {HNW_SMOKING_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="text-[10px] text-slate-500 font-bold">Class</label>
+                                            <select value={hnwClass} onChange={(e) => setHnwClass(e.target.value)} className="w-full border rounded p-1.5 text-sm">
+                                                <option value="">Please select</option>
+                                                {HNW_CLASS_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                        <div>
+                                            <label className="text-[10px] text-slate-500 font-bold">Nationality</label>
+                                            <input type="text" value={hnwNationality} onChange={(e) => setHnwNationality(e.target.value)} className="w-full border rounded p-1.5 text-sm" placeholder="e.g. HKG"/>
+                                        </div>
+                                        <div>
+                                            <label className="text-[10px] text-slate-500 font-bold">Residency</label>
+                                            <select value={hnwResidency} onChange={(e) => handleHnwResidencyChange(e.target.value)} className="w-full border rounded p-1.5 text-sm">
+                                                <option value="">Please select</option>
+                                                {COUNTRY_GROUP_DATA.map(c => <option key={c.country} value={c.country}>{c.country}</option>)}
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="text-[10px] text-slate-500 font-bold">Policy term</label>
+                                            <input type="text" value={hnwTerm} onChange={(e) => setHnwTerm(e.target.value)} className="w-full border rounded p-1.5 text-sm" placeholder="e.g. 10/15/20"/>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                        <div>
+                                            <label className="text-[10px] text-slate-500 font-bold">Sum assured (USD)</label>
+                                            <input type="number" value={hnwSumAssured} onChange={(e) => setHnwSumAssured(e.target.value)} className="w-full border rounded p-1.5 text-sm"/>
+                                        </div>
+                                        <div>
+                                            <label className="text-[10px] text-slate-500 font-bold">Annual premium</label>
+                                            <input type="text" value={hnwAnnualPremium} onChange={(e) => setHnwAnnualPremium(e.target.value)} className="w-full border rounded p-1.5 text-sm"/>
+                                        </div>
+                                        <div>
+                                            <label className="text-[10px] text-slate-500 font-bold">Existing coverage (USD)</label>
+                                            <input type="number" value={hnwExistingCoverage} onChange={(e) => setHnwExistingCoverage(e.target.value)} className="w-full border rounded p-1.5 text-sm"/>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="text-[10px] text-slate-500 font-bold">Occupation</label>
+                                            <input type="text" value={hnwOccupation} onChange={(e) => setHnwOccupation(e.target.value)} className="w-full border rounded p-1.5 text-sm"/>
+                                        </div>
+                                        <div>
+                                            <label className="text-[10px] text-slate-500 font-bold">Medically</label>
+                                            <input type="text" value={hnwMedically} onChange={(e) => setHnwMedically(e.target.value)} className="w-full border rounded p-1.5 text-sm" placeholder="e.g. Provided / Not provided"/>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label className="text-[10px] text-slate-500 font-bold">Financially</label>
+                                        <input type="text" value={hnwFinancially} onChange={(e) => setHnwFinancially(e.target.value)} className="w-full border rounded p-1.5 text-sm" placeholder="e.g. Provided / Not provided"/>
+                                    </div>
+
+                                    {hnwWarnings && hnwWarnings.length > 0 && (
+                                        <div className="bg-orange-50 border border-orange-200 rounded p-3 text-xs text-orange-800 space-y-1">
+                                            {hnwWarnings.map((w, i) => <div key={i}>• {w}</div>)}
+                                        </div>
+                                    )}
+
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        <button
+                                            type="button"
+                                            onClick={handleRunHnwSummary}
+                                            className="px-3 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                                        >
+                                            Generate Summary
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                try { navigator.clipboard.writeText(hnwSummary || ""); } catch(e) {}
+                                            }}
+                                            className="px-3 py-2 text-sm bg-white border border-slate-300 text-slate-800 rounded hover:bg-slate-50 transition-colors"
+                                        >
+                                            Copy Summary
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => { setHnwSummary(""); }}
+                                            className="px-3 py-2 text-sm bg-slate-100 border border-slate-200 text-slate-700 rounded hover:bg-slate-200 transition-colors"
+                                        >
+                                            Clear
+                                        </button>
+                                    </div>
+
+                                    <div>
+                                        <label className="text-[10px] text-slate-500 font-bold">Summary output</label>
+                                        <textarea value={hnwSummary} readOnly className="w-full border rounded p-2 text-sm min-h-[160px] bg-slate-50"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+/* Export Options Modal (Hybrid Mode) */}
                     {isExportOptionsOpen && (
                         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
                             <div className="w-full max-w-lg bg-white rounded-xl shadow-xl border border-slate-200 overflow-hidden">
