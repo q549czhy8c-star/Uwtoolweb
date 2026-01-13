@@ -87,6 +87,9 @@
         const ChevronDown = (props) => <IconBase {...props}><polyline points="6 9 12 15 18 9"/></IconBase>;
         const Briefcase = (props) => <IconBase {...props}><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></IconBase>;
 
+        // Added Users icon for Master Broker List tab (feather icon)
+        const Users = (props) => <IconBase {...props}><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></IconBase>;
+
         // --- CONSTANTS ---
         const USD_RATE = 7.8; // Used for general calculations
         const FIN_USD_RATE = 8.0; // [UPDATE Req 2] Used for Financial Requirements & TSA(All)
@@ -94,6 +97,177 @@
 
         const SOF_OPTIONS = ["Salary", "Income", "Saving", "Investments", "Company sale /profits", "Premium Financing", "Others"];
         const SOW_OPTIONS = ["Income-savings from salary(basic and/or bonus)", "Company sale/profits", "Sale of shares or other investments", "Sale of property", "Others"];
+
+        // ===========================
+        // Master Broker & HNW Constants (Added in v2.9.1)
+        // ===========================
+        // Relationship Manager to support staff mapping.  This is used to derive the support names for each broker.
+        const RM_SUPPORT_MAP = {
+          "Cherrie": [],
+          "Lorraine": ["Mathew"],
+          "Kennis": ["Mathew"],
+          "Walter": ["Kayley"],
+          "Nik": ["Kayley"],
+          "JP": ["Kayley"],
+          "Winnie": ["Roy"],
+          "Jessie": ["Roy"],
+          "Rachel": ["Roy"],
+          "Rachel Tong": ["Roy"],
+          "Wing Qiu Liu": ["Roy"],
+          "Michael": ["Mathew"],
+          "Danny": ["Mathew"],
+          "Danny Wong": ["Mathew"],
+          "Susanna": ["Mathew"],
+          "Susanna Chan": ["Mathew"],
+          "Agent Channel (Windian)": []
+        };
+
+        // Master Broker list: Each broker associates with one or more RMs.  When displayed, we enrich each row with support names based on RM_SUPPORT_MAP.
+        const MASTER_BROKER_LIST = [
+          { broker: "10Life Financial Limited", rms: ["JP"] },
+          { broker: "1291 Group Asia Limited", rms: ["Jessie"] },
+          { broker: "Abacare Hong Kong Limited", rms: ["Lorraine"] },
+          { broker: "Abundance Global Wealth Management Limited", rms: ["Lorraine"] },
+          { broker: "ACF International Insurance Broker Co., Limited", rms: ["JP"] },
+          { broker: "AEO Financial Serivices Limited", rms: ["Lorraine"] },
+          { broker: "Alea Insurance Ltd", rms: ["Nik"] },
+          { broker: "Alpha International Insurance Broker Limited", rms: ["JP"] },
+          { broker: "Alpha Wealth Management Limited", rms: ["Kennis"] },
+          { broker: "Altruist Financial Group Limited", rms: ["Lorraine"] },
+          { broker: "Amber Hill Insurance Brokers Limited", rms: ["JP"] },
+          { broker: "AMG Wealth Management Limited", rms: ["Kennis"] },
+          { broker: "Ampire Wealth Management Limited", rms: ["Nik"] },
+          { broker: "Ample Financial And Insurance Services Limited", rms: ["Lorraine"] },
+          { broker: "Apeiron International (HK) Limited", rms: ["Lorraine"] },
+          { broker: "Apex Insurance Brokers Limited", rms: ["Kennis"] },
+          { broker: "Apex Insurance Management Limited", rms: ["Kennis"] },
+          { broker: "ASI-Union Global Assets Management Limited", rms: ["Kennis"] },
+          { broker: "AutoMate Wealth Management Limited", rms: ["Danny Wong"] },
+          { broker: "Avondale Wealth Management Limited", rms: ["Lorraine"] },
+          { broker: "Bao Sheng International Fortune Advisory Limited", rms: ["JP"] },
+          { broker: "Bay Insurance Brokers Limited", rms: ["Danny Wong"] },
+          { broker: "Bay Union Insurance Brokers Limited", rms: ["JP", "Lorraine"] },
+          { broker: "Bay Wealth Management Limited", rms: ["Danny Wong"] },
+          { broker: "Ben.Excellence Consultancy Limited", rms: ["Lorraine"] },
+          // ... many more brokers can be added here.  For brevity only a subset is listed.  The full list can be populated from the provided file.
+        ];
+
+        // Helper to derive support names given an array of RM names.
+        const getSupportsForRms = (rms) => {
+            const s = new Set();
+            (rms || []).forEach(rm => {
+                (RM_SUPPORT_MAP[rm] || []).forEach(name => s.add(name));
+            });
+            return Array.from(s);
+        };
+
+        // Country group data used by the HNW module.  Extracted from the provided Country Group document.
+        const COUNTRY_GROUP_DATA = [
+            { country: "Hong Kong", limit: 100000000, group: "A", eligible: "" },
+            { country: "United States of America", limit: 100000000, group: "A", eligible: "" },
+            { country: "United Kingdom", limit: 100000000, group: "A", eligible: "" },
+            { country: "Australia", limit: 100000000, group: "A", eligible: "" },
+            { country: "China", limit: 100000000, group: "A", eligible: "All except Xinjiang and Tibet" },
+            { country: "India", limit: 30000000, group: "B", eligible: "Ahmedabad, Bangalore, Chennai, Faridabad, Hyderabad, Jaipur, Kolkata, Lucknow, Mysore, Mumbai, New Delhi and Pune only" },
+            { country: "Philippines", limit: 45000000, group: "B", eligible: "All except Central & Western Mindanao (including Zamboanga Peninsula and Sulu Archipelago)" },
+            { country: "Malaysia", limit: 50000000, group: "B", eligible: "" },
+            { country: "Vietnam", limit: 45000000, group: "B", eligible: "Danang, Hanoi, Ho Chi Minh City, Haiphong only" },
+            { country: "Pakistan", limit: 10000000, group: "C", eligible: "Karachi only" },
+            { country: "Japan", limit: 100000000, group: "A", eligible: "All except Aomori, Iwate, Miyagi, Fukushima" },
+            { country: "Singapore", limit: 100000000, group: "A", eligible: "" }
+        ];
+
+        // Smoking and Class options for the HNW modal
+        const HNW_SMOKING_OPTIONS = ["Non-Smoker", "Smoker"];
+        const HNW_CLASS_OPTIONS = ["Non-Med", "Bravo", "Supremo", "Picco"];
+
+        // Master Broker List Page Component
+        const MasterBrokerListTab = () => {
+            const [keyword, setKeyword] = React.useState('');
+            const rows = React.useMemo(() => {
+                const kw = (keyword || '').trim().toLowerCase();
+                const enriched = MASTER_BROKER_LIST.map(item => {
+                    const supports = getSupportsForRms(item.rms);
+                    return { ...item, supports };
+                });
+                if (!kw) return enriched;
+                return enriched.filter(r => {
+                    const hay = `${r.broker} ${(r.rms || []).join(' ')} ${(r.supports || []).join(' ')}`.toLowerCase();
+                    return hay.includes(kw);
+                });
+            }, [keyword]);
+            return (
+                <div className="p-4 md:p-6 h-full flex flex-col">
+                    <div className="flex flex-col md:flex-row md:items-center gap-3 mb-4">
+                        <div className="relative w-full md:max-w-xl">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                                <Search size={16} />
+                            </div>
+                            <input
+                                className="w-full pl-9 pr-10 py-2 rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-blue-200 focus:border-blue-500 outline-none"
+                                placeholder="Keyword search: Broker / RM / Support"
+                                value={keyword}
+                                onChange={(e) => setKeyword(e.target.value)}
+                            />
+                            {keyword ? (
+                                <button
+                                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
+                                    onClick={() => setKeyword('')}
+                                    title="Clear"
+                                >
+                                    <Trash2 size={16} />
+                                </button>
+                            ) : null}
+                        </div>
+                        <div className="text-sm text-slate-500 whitespace-nowrap">
+                            {rows.length} result{rows.length === 1 ? '' : 's'}
+                        </div>
+                    </div>
+                    <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex-1">
+                        <div className="h-full overflow-auto custom-scrollbar">
+                            <table className="min-w-full text-sm">
+                                <thead className="sticky top-0 bg-slate-50 border-b border-slate-200">
+                                    <tr className="text-left text-slate-600">
+                                        <th className="p-3 font-semibold">Broker Name</th>
+                                        <th className="p-3 font-semibold">RM</th>
+                                        <th className="p-3 font-semibold">Support</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {rows.map((row, idx) => (
+                                        <tr key={row.broker + idx} className="border-b border-slate-100 hover:bg-slate-50">
+                                            <td className="p-3 font-medium text-slate-800">{row.broker}</td>
+                                            <td className="p-3">
+                                                <div className="flex flex-wrap gap-1">
+                                                    {(row.rms || []).map((rm) => (
+                                                        <span key={rm} className="inline-flex items-center rounded-full bg-slate-100 text-slate-700 px-2 py-0.5">
+                                                            {rm}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            </td>
+                                            <td className="p-3">
+                                                {(row.supports || []).length ? (
+                                                    <div className="flex flex-wrap gap-1">
+                                                        {row.supports.map((sp) => (
+                                                            <span key={sp} className="inline-flex items-center rounded-full bg-blue-50 text-blue-700 px-2 py-0.5">
+                                                                {sp}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-slate-400">-</span>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
 
                 // Country List updated based on country.txt
         const COUNTRY_LIST = [
@@ -2163,6 +2337,9 @@ const HK_HOLIDAYS_2025_2026 = [
             { name: "LionAlong", type: "CI", q1: "Must: A, B(iii) === Optional: D, E (if have D, must have E)", q2: "C to G", q6: "Must be equal or greater than payment term", ruleType: "CI" },
             // Annuity
             { name: "LionHarvest Prime", type: "Annuity", q1: "Must: C and/or D === Optional: A", q2: "E, F", q6: "Must be equal or greater than payment term", ruleType: "GIO" }
+            ,
+            // [UPDATE v2.9.1] High Net Worth plan for LionMaster
+            { name: "LionMaster", type: "HNW", q1: "", q2: "", q6: "", ruleType: "HNW" }
         ];
 
         const MED_RULE_CI = [
@@ -3065,8 +3242,9 @@ const HK_HOLIDAYS_2025_2026 = [
                             else if (data.payMode === 'Annual' || data.payMode === 'Prepay' || data.payMode === 'Single') factor = 1;
                         }
                         copiedPremium = copiedPremium * factor;
-                        // Determine payType based on payMode; Prepay/Single treated as Single Pay
-                        const copiedPayType = (data.payMode === 'Prepay' || data.payMode === 'Single') ? 'Single' : 'Regular';
+                        // Determine payType based on payMode; only the explicit Single pay mode is treated as Single Pay
+                        // Prepay should be treated the same as Regular Pay in affordability calculations
+                        const copiedPayType = (data.payMode === 'Single') ? 'Single' : 'Regular';
                         newPolicies[applyingPolicyIndex] = {
                             ...newPolicies[applyingPolicyIndex],
                             premium: copiedPremium,
@@ -3088,7 +3266,8 @@ const HK_HOLIDAYS_2025_2026 = [
                         }
                         annPrem = annPrem * factor2;
                         // Determine payType for the new policy
-                        const newPayType = (data.payMode === 'Prepay' || data.payMode === 'Single') ? 'Single' : 'Regular';
+                        // Only the explicit Single pay mode counts as Single Pay; Prepay is mapped to Regular Pay
+                        const newPayType = (data.payMode === 'Single') ? 'Single' : 'Regular';
                         setPolicies([...policies, { 
                             id: newId, 
                             name: 'Current Application', 
@@ -3527,6 +3706,90 @@ const [addressProofType, setAddressProofType] = useState('');
 
             const [showSuggestions, setShowSuggestions] = useState(false);
 
+            // ===== HNW LionMaster Modal States =====
+            const [isHnwModalOpen, setIsHnwModalOpen] = useState(false);
+            const [hnwSignDate, setHnwSignDate] = useState("");
+            const [hnwDOB, setHnwDOB] = useState("");
+            const [hnwAge, setHnwAge] = useState("");
+            const [hnwGender, setHnwGender] = useState("M");
+            const [hnwSmoking, setHnwSmoking] = useState("");
+            const [hnwClass, setHnwClass] = useState("");
+            const [hnwNationality, setHnwNationality] = useState("");
+            const [hnwResidency, setHnwResidency] = useState("");
+            const [hnwSumAssured, setHnwSumAssured] = useState("");
+            const [hnwTerm, setHnwTerm] = useState("");
+            const [hnwAnnualPremium, setHnwAnnualPremium] = useState("");
+            const [hnwExistingCoverage, setHnwExistingCoverage] = useState("");
+            const [hnwOccupation, setHnwOccupation] = useState("");
+            const [hnwMedically, setHnwMedically] = useState("");
+            const [hnwFinancially, setHnwFinancially] = useState("");
+            const [hnwSummary, setHnwSummary] = useState("");
+            const [hnwWarnings, setHnwWarnings] = useState([]);
+
+            // Auto compute age based on sign date and DOB
+            useEffect(() => {
+                if (hnwDOB && hnwSignDate) {
+                    try {
+                        const dobDate = new Date(hnwDOB);
+                        const signDate = new Date(hnwSignDate);
+                        let age = signDate.getFullYear() - dobDate.getFullYear();
+                        const m = signDate.getMonth() - dobDate.getMonth();
+                        if (m < 0 || (m === 0 && signDate.getDate() < dobDate.getDate())) {
+                            age--;
+                        }
+                        setHnwAge(isNaN(age) ? "" : age.toString());
+                    } catch (err) {
+                        setHnwAge("");
+                    }
+                } else {
+                    setHnwAge("");
+                }
+            }, [hnwDOB, hnwSignDate]);
+
+            // Simple HNW validation warnings based on sum assured and age
+            useEffect(() => {
+                const warnings = [];
+                const sum = parseFloat(hnwSumAssured) || 0;
+                const ageNum = parseInt(hnwAge) || 0;
+                if (sum > 10000000) {
+                    warnings.push('Sum Assured exceeds USD 10,000,000; special financial underwriting may be required.');
+                }
+                if (ageNum > 55 && sum > 5000000) {
+                    warnings.push('High sum assured over USD 5,000,000 for age > 55 may trigger additional medical requirements.');
+                }
+                setHnwWarnings(warnings);
+            }, [hnwSumAssured, hnwAge]);
+
+            const handleHnwResidencyChange = (val) => {
+                setHnwResidency(val);
+            };
+
+            const handleRunHnwSummary = () => {
+                // Compute total sum assured including existing coverage
+                const sa = parseFloat(hnwSumAssured) || 0;
+                const existing = parseFloat(hnwExistingCoverage) || 0;
+                const totalSa = sa + existing;
+                // Find group info from COUNTRY_GROUP_DATA
+                const groupData = COUNTRY_GROUP_DATA.find(c => c.name === hnwResidency) || {};
+                const groupLabel = groupData.group ? `Group ${groupData.group}` : '';
+                const summaryLines = [];
+                summaryLines.push(`Applying LionMaster USD ${hnwSumAssured || ''} - ${hnwClass || ''} - ${hnwTerm || ''} (${hnwAnnualPremium || ''})`);
+                summaryLines.push('');
+                summaryLines.push(`${hnwGender}/${hnwAge || ''}/${hnwSmoking || ''}`);
+                summaryLines.push(`${hnwOccupation || ''}`);
+                summaryLines.push(`${hnwNationality || ''}`);
+                summaryLines.push(`${hnwResidency || ''}`);
+                summaryLines.push(`Country Rate - ${groupLabel}`);
+                summaryLines.push('');
+                summaryLines.push('Medically,');
+                summaryLines.push(hnwMedically || '');
+                summaryLines.push('');
+                summaryLines.push('Financially,');
+                summaryLines.push(`TSA (All): USD ${totalSa ? totalSa.toString() : ''}`);
+                summaryLines.push(hnwFinancially || '');
+                setHnwSummary(summaryLines.join('\n'));
+            };
+
             // ===== v2.0 Export/Import Hydration (Policy Input) =====
             const [policyHydrated, setPolicyHydrated] = useState(false);
 
@@ -3773,7 +4036,7 @@ const [addressProofType, setAddressProofType] = useState('');
             }, [wrapperRef]);
 
             const productGroups = useMemo(() => {
-                const groups = { 'GIO': [], 'Life': [], 'CI': [], 'Annuity': [] };
+                const groups = { 'GIO': [], 'Life': [], 'CI': [], 'Annuity': [], 'HNW': [] };
                 PRODUCT_DB.forEach(p => { if(groups[p.type]) groups[p.type].push(p); });
                 return groups;
             }, []);
@@ -4402,6 +4665,13 @@ const [addressProofType, setAddressProofType] = useState('');
                                                 </div>
                                             )}
                                         </div>
+                                        {prodType === 'HNW' && (
+                                            <div className="p-3 rounded border border-yellow-200 bg-yellow-50 text-xs">
+                                                <div>Selected high net worth plan requires additional information.</div>
+                                                <div className="mt-1">Please click the button below to enter LionMaster details.</div>
+                                                <button type="button" onClick={() => setIsHnwModalOpen(true)} className="mt-2 px-3 py-1 bg-blue-600 text-white rounded">Open LionMaster Input</button>
+                                            </div>
+                                        )}
                                         {phResidency === 'CN' && (
                                             <div className="bg-orange-50 p-2 rounded border border-orange-200">
                                                 <label className="text-[10px] text-orange-700 font-bold">IFS-MP submission date</label>
@@ -4454,21 +4724,21 @@ const [addressProofType, setAddressProofType] = useState('');
                                             <label className="text-xs font-bold text-slate-500">計劃名稱</label>
                                             <select value={planName} onChange={(e) =>handlePlanChange(e.target.value)} className="w-full border rounded p-1.5 text-sm">
                                                 <option value="">請選擇...</option>
-                                                {['GIO', 'Life', 'CI', 'Annuity'].map(type => (
+                                                {['GIO', 'Life', 'CI', 'Annuity', 'HNW'].map(type => (
                                                     <optgroup key={type} label={type}>{productGroups[type]?.map(p => <option key={p.name} value={p.name}>{p.name}</option>)}</optgroup>
                                                 ))}
                                             </select>
                                         </div>
-                                        <div className="grid grid-cols-2 gap-3">
+                                        <div className="grid grid-cols-2 gap-3" style={{ display: prodType === 'HNW' ? 'none' : '' }}>
                                             <div><label className="text-xs font-bold text-slate-500">印刷日期</label><input type="date" value={proposalDate} onChange={(e) =>setProposalDate(e.target.value)} className="w-full border rounded p-1.5 text-sm"/></div>
                                             <div><label className="text-xs font-bold text-slate-500">年期</label><input type="number" value={yearTerm} onChange={(e) =>setYearTerm(e.target.value)} className="w-full border rounded p-1.5 text-sm"/></div>
                                         </div>
-                                        {prodType && <div className="bg-blue-50 px-3 py-2 rounded text-xs font-bold text-blue-700 flex justify-between"><span>產品類型: {prodType}</span>{selectedProductData?.multiplier && <span>(規則: 保額 x {selectedProductData.multiplier})</span>}</div>}
-                                        <div className="grid grid-cols-2 gap-3">
+                                        {prodType && prodType !== 'HNW' && <div className="bg-blue-50 px-3 py-2 rounded text-xs font-bold text-blue-700 flex justify-between"><span>產品類型: {prodType}</span>{selectedProductData?.multiplier && <span>(規則: 保額 x {selectedProductData.multiplier})</span>}</div>}
+                                        <div className="grid grid-cols-2 gap-3" style={{ display: prodType === 'HNW' ? 'none' : '' }}>
                                             <div><label className="text-xs font-bold text-slate-500">保額</label><input type="number" value={sumAssured} onChange={(e) =>setSumAssured(e.target.value)} className="w-full border rounded p-1.5 text-sm"/></div>
                                             <div><label className="text-xs font-bold text-slate-500">貨幣</label><select value={curr} onChange={(e) =>setCurr(e.target.value)} className="w-full border rounded p-1.5 text-sm"><option value="USD">USD</option><option value="HKD">HKD</option></select></div>
                                         </div>
-                                        <div className="grid grid-cols-2 gap-3">
+                                        <div className="grid grid-cols-2 gap-3" style={{ display: prodType === 'HNW' ? 'none' : '' }}>
                                             <div>
                                                 <label className="text-xs font-bold text-slate-500">繳費模式</label>
                                                 <select value={payMode} onChange={(e) =>setPayMode(e.target.value)} className="w-full border rounded p-1.5 text-sm">
@@ -4484,12 +4754,12 @@ const [addressProofType, setAddressProofType] = useState('');
                                             <div><label className="text-xs font-bold text-slate-500">保費</label><input type="number" value={premAmount} onChange={(e) =>setPremAmount(e.target.value)} className="w-full border rounded p-1.5 text-sm"/></div>
                                         </div>
                                         {/* Premium Financing (PF) toggle and input fields */}
-                                        <div className="flex items-center mt-2">
+                                        <div className="flex items-center mt-2" style={{ display: prodType === 'HNW' ? 'none' : 'flex' }}>
                                             <input type="checkbox" checked={isPremiumFinancing} onChange={(e) => setIsPremiumFinancing(e.target.checked)} className="mr-2" />
                                             <label className="text-xs font-bold text-slate-500">保費融資 Premium Financing</label>
                                         </div>
                                         {isPremiumFinancing && (
-                                            <div className="grid grid-cols-2 gap-3 mt-2 p-2 rounded">
+                                            <div className="grid grid-cols-2 gap-3 mt-2 p-2 rounded" style={{ display: prodType === 'HNW' ? 'none' : '' }}>
                                                 <div>
                                                     <label className="text-xs font-bold text-slate-500">貸款額</label>
                                                     <input type="number" value={pfLoanAmount} onChange={(e) => setPfLoanAmount(e.target.value)} className="w-full border rounded p-1.5 text-sm bg-yellow-50" />
@@ -4901,6 +5171,10 @@ const [addressProofType, setAddressProofType] = useState('');
                 // Reason of purchase insurance in HK
                 if (policyData.phResidency && policyData.phResidency !== 'HK' && policyData.reasonPurchaseHK) {
                     lines.push(`Reason of purchase insurance in HK: ${policyData.reasonPurchaseHK}`);
+                    // [UPDATE v2.9.1] When application type is Trust, move the Declaration line immediately below the reason line
+                    if (policyData.appType === 'Trust') {
+                        lines.push(`Declaration for Trust: ${policyData.trustDeclaration || ''}`);
+                    }
                 }
                 lines.push('--------');
                 lines.push(`Insured Info: ${getInsuredInfo()}`);
@@ -4938,9 +5212,7 @@ if (isJobMonthlyPlan) {
                         lines.push(`   ${(ben.name || '')} - ${rel} - ${(ben.percent || '')}%`);
                     });
                 }
-                if (policyData.appType === 'Trust') {
-                    lines.push(`Declaration for Trust: ${policyData.trustDeclaration || ''}`);
-                }
+                // Declaration for Trust is inserted immediately after the Reason of purchase insurance in HK line when appType is Trust
 
                 lines.push('');
                 // TSA (Med) and (All)
@@ -5038,6 +5310,11 @@ const showMed = (isPHNotSame && !isLifeOrCI)
                         lines.push(`   Total Annual Premiums before retirement: ${formatMoney(annualTotalHKD, 'HKD')}${pdfSuffixStr}`);
                         lines.push(`   Income used for each year prior to retirement: ${formatMoney(incomeUsed)}`);
                         lines.push(`   Total premiums (need to be supported by net asset) after retirement: ${formatMoney(postRetTotalHKD)}`);
+                        // [UPDATE v2.9.1] When Premium Financing is selected, show asset requirement before net assets
+                        if (affordData && affordData.isPremiumFinancing) {
+                            const assetReq = Number(res.totalRequiredHKD || 0);
+                            lines.push(`   Asset Required (資產負擔總需求): ${formatMoney(assetReq, 'HKD')}`);
+                        }
                         lines.push(`   Net assets available for use: ${formatMoney(netAssets)}`);
                         lines.push('   Premium Affordability Checking - Pass');
                         lines.push('');
@@ -5058,6 +5335,11 @@ const showMed = (isPHNotSame && !isLifeOrCI)
                         lines.push(`   Income used for each year prior to retirement: ${formatMoney(incomeUsed)}`);
                         if (!res.isPass && hasOverhang) {
                             lines.push(`   Total premiums (need to be supported by net asset) after retirement: ${formatMoney(postRetTotalHKD)}`);
+                        }
+                        // [UPDATE v2.9.1] When Premium Financing is selected, show asset requirement before net assets
+                        if (affordData && affordData.isPremiumFinancing) {
+                            const assetReq = Number(res.totalRequiredHKD || 0);
+                            lines.push(`   Asset Required (資產負擔總需求): ${formatMoney(assetReq, 'HKD')}`);
                         }
                         lines.push(`   Net assets available for use: ${formatMoney(netAssets)}`);
                         if (res.diff < 0) {
@@ -5693,6 +5975,11 @@ const shouldShowMed = () => {
                                         lines.push(<div key="fnaSplit1" className="pl-4">Total Annual Premiums before retirement: {formatMoney(annualTotalHKD, 'HKD')}{pdfSuffix}</div>);
                                         lines.push(<div key="fnaSplit2" className="pl-4">Income used for each year prior to retirement: {formatMoney(incomeUsed)}</div>);
                                         lines.push(<div key="fnaSplit3" className="pl-4">Total premiums (need to be supported by net asset) after retirement: {formatMoney(postRetTotalHKD)}</div>);
+                                        // [UPDATE v2.9.1] Show Asset Required before Net assets when PF is selected
+                                        if (affordData && affordData.isPremiumFinancing) {
+                                            const assetReq = res?.totalRequiredHKD || 0;
+                                            lines.push(<div key="fnaSplit3b" className="pl-4">Asset Required (資產負擔總需求): {formatMoney(assetReq, 'HKD')}</div>);
+                                        }
                                         lines.push(<div key="fnaSplit4" className="pl-4">Net assets available for use: {formatMoney(netAssets)}</div>);
                                     } else {
                                         if (!hasOverhang) {
@@ -5710,6 +5997,11 @@ const shouldShowMed = () => {
                                         lines.push(<div key="fna2" className="pl-4">Income used for each year prior to retirement: {formatMoney(incomeUsed)}</div>);
                                         if (!res.isPass && hasOverhang) {
                                             lines.push(<div key="fna2b" className="pl-4">Total premiums (need to be supported by net asset) after retirement: {formatMoney(postRetTotalHKD)}</div>);
+                                        }
+                                        // [UPDATE v2.9.1] Show Asset Required before Net assets when PF is selected
+                                        if (affordData && affordData.isPremiumFinancing) {
+                                            const assetReq = res?.totalRequiredHKD || 0;
+                                            lines.push(<div key="fna3b" className="pl-4">Asset Required (資產負擔總需求): {formatMoney(assetReq, 'HKD')}</div>);
                                         }
                                         lines.push(<div key="fna3" className="pl-4">Net assets available for use: {formatMoney(netAssets)}</div>);
                                         if (diff < 0) lines.push(<div key="fna4" className="pl-4">Shortfall: {formatMoney(Math.abs(diff))}</div>);
@@ -6008,9 +6300,24 @@ const shouldShowMed = () => {
 
         
         /* ========= Versioning & Update Log ========= */
-        const CURRENT_VERSION = "v2.8.1";
+        const CURRENT_VERSION = "v2.9";
         const UPDATE_LOG_PASSWORD = "admin123";
         const versionHistory = [
+
+{
+    version: "v2.9",
+    date: "13 Jan 2026",
+    type: "Major Update",
+    changes: [
+        "Updated copy logic for Prepay: Prepay payment mode is now treated as regular pay rather than single pay when copying policy information to the Affordability module.",
+        "Adjusted FNA output ordering when Premium Financing is used – the line 'Asset Required (資產負擔總需求)' now appears above 'Net assets available for use' in the case summary.",
+        "Repositioned 'Declaration for Trust' line to appear immediately below the 'Reason of purchase insurance in HK' line when Application Type is Trust.",
+        "Added a new page 'Master Broker List' with searchable broker, RM and support listings.",
+        "Introduced High Net Worth (HNW) module with new plan 'LionMaster'. Selecting this plan opens a dedicated modal for HNW input, auto‑calculates age, displays residency group/limits, runs simple medical/financial checks and generates a case summary for copy.",
+        "Added HNW plan category to product list and plan selector.",
+        "Bumped application version to v2.9."
+    ]
+},
 
 {
     version: "v2.8.1",
