@@ -2,12 +2,15 @@
 
 
 
+
+
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UW assessment tool (v2.7)</title>
+    <!-- Updated version title -->
+    <title>UW assessment tool (v2.8.3)</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -87,9 +90,6 @@
         const ChevronDown = (props) => <IconBase {...props}><polyline points="6 9 12 15 18 9"/></IconBase>;
         const Briefcase = (props) => <IconBase {...props}><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></IconBase>;
 
-        // Added Users icon for Master Broker List tab (feather icon)
-        const Users = (props) => <IconBase {...props}><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></IconBase>;
-
         // --- CONSTANTS ---
         const USD_RATE = 7.8; // Used for general calculations
         const FIN_USD_RATE = 8.0; // [UPDATE Req 2] Used for Financial Requirements & TSA(All)
@@ -97,177 +97,6 @@
 
         const SOF_OPTIONS = ["Salary", "Income", "Saving", "Investments", "Company sale /profits", "Premium Financing", "Others"];
         const SOW_OPTIONS = ["Income-savings from salary(basic and/or bonus)", "Company sale/profits", "Sale of shares or other investments", "Sale of property", "Others"];
-
-        // ===========================
-        // Master Broker & HNW Constants (Added in v2.9.1)
-        // ===========================
-        // Relationship Manager to support staff mapping.  This is used to derive the support names for each broker.
-        const RM_SUPPORT_MAP = {
-          "Cherrie": [],
-          "Lorraine": ["Mathew"],
-          "Kennis": ["Mathew"],
-          "Walter": ["Kayley"],
-          "Nik": ["Kayley"],
-          "JP": ["Kayley"],
-          "Winnie": ["Roy"],
-          "Jessie": ["Roy"],
-          "Rachel": ["Roy"],
-          "Rachel Tong": ["Roy"],
-          "Wing Qiu Liu": ["Roy"],
-          "Michael": ["Mathew"],
-          "Danny": ["Mathew"],
-          "Danny Wong": ["Mathew"],
-          "Susanna": ["Mathew"],
-          "Susanna Chan": ["Mathew"],
-          "Agent Channel (Windian)": []
-        };
-
-        // Master Broker list: Each broker associates with one or more RMs.  When displayed, we enrich each row with support names based on RM_SUPPORT_MAP.
-        const MASTER_BROKER_LIST = [
-          { broker: "10Life Financial Limited", rms: ["JP"] },
-          { broker: "1291 Group Asia Limited", rms: ["Jessie"] },
-          { broker: "Abacare Hong Kong Limited", rms: ["Lorraine"] },
-          { broker: "Abundance Global Wealth Management Limited", rms: ["Lorraine"] },
-          { broker: "ACF International Insurance Broker Co., Limited", rms: ["JP"] },
-          { broker: "AEO Financial Serivices Limited", rms: ["Lorraine"] },
-          { broker: "Alea Insurance Ltd", rms: ["Nik"] },
-          { broker: "Alpha International Insurance Broker Limited", rms: ["JP"] },
-          { broker: "Alpha Wealth Management Limited", rms: ["Kennis"] },
-          { broker: "Altruist Financial Group Limited", rms: ["Lorraine"] },
-          { broker: "Amber Hill Insurance Brokers Limited", rms: ["JP"] },
-          { broker: "AMG Wealth Management Limited", rms: ["Kennis"] },
-          { broker: "Ampire Wealth Management Limited", rms: ["Nik"] },
-          { broker: "Ample Financial And Insurance Services Limited", rms: ["Lorraine"] },
-          { broker: "Apeiron International (HK) Limited", rms: ["Lorraine"] },
-          { broker: "Apex Insurance Brokers Limited", rms: ["Kennis"] },
-          { broker: "Apex Insurance Management Limited", rms: ["Kennis"] },
-          { broker: "ASI-Union Global Assets Management Limited", rms: ["Kennis"] },
-          { broker: "AutoMate Wealth Management Limited", rms: ["Danny Wong"] },
-          { broker: "Avondale Wealth Management Limited", rms: ["Lorraine"] },
-          { broker: "Bao Sheng International Fortune Advisory Limited", rms: ["JP"] },
-          { broker: "Bay Insurance Brokers Limited", rms: ["Danny Wong"] },
-          { broker: "Bay Union Insurance Brokers Limited", rms: ["JP", "Lorraine"] },
-          { broker: "Bay Wealth Management Limited", rms: ["Danny Wong"] },
-          { broker: "Ben.Excellence Consultancy Limited", rms: ["Lorraine"] },
-          // ... many more brokers can be added here.  For brevity only a subset is listed.  The full list can be populated from the provided file.
-        ];
-
-        // Helper to derive support names given an array of RM names.
-        const getSupportsForRms = (rms) => {
-            const s = new Set();
-            (rms || []).forEach(rm => {
-                (RM_SUPPORT_MAP[rm] || []).forEach(name => s.add(name));
-            });
-            return Array.from(s);
-        };
-
-        // Country group data used by the HNW module.  Extracted from the provided Country Group document.
-        const COUNTRY_GROUP_DATA = [
-            { country: "Hong Kong", limit: 100000000, group: "A", eligible: "" },
-            { country: "United States of America", limit: 100000000, group: "A", eligible: "" },
-            { country: "United Kingdom", limit: 100000000, group: "A", eligible: "" },
-            { country: "Australia", limit: 100000000, group: "A", eligible: "" },
-            { country: "China", limit: 100000000, group: "A", eligible: "All except Xinjiang and Tibet" },
-            { country: "India", limit: 30000000, group: "B", eligible: "Ahmedabad, Bangalore, Chennai, Faridabad, Hyderabad, Jaipur, Kolkata, Lucknow, Mysore, Mumbai, New Delhi and Pune only" },
-            { country: "Philippines", limit: 45000000, group: "B", eligible: "All except Central & Western Mindanao (including Zamboanga Peninsula and Sulu Archipelago)" },
-            { country: "Malaysia", limit: 50000000, group: "B", eligible: "" },
-            { country: "Vietnam", limit: 45000000, group: "B", eligible: "Danang, Hanoi, Ho Chi Minh City, Haiphong only" },
-            { country: "Pakistan", limit: 10000000, group: "C", eligible: "Karachi only" },
-            { country: "Japan", limit: 100000000, group: "A", eligible: "All except Aomori, Iwate, Miyagi, Fukushima" },
-            { country: "Singapore", limit: 100000000, group: "A", eligible: "" }
-        ];
-
-        // Smoking and Class options for the HNW modal
-        const HNW_SMOKING_OPTIONS = ["Non-Smoker", "Smoker"];
-        const HNW_CLASS_OPTIONS = ["Non-Med", "Bravo", "Supremo", "Picco"];
-
-        // Master Broker List Page Component
-        const MasterBrokerListTab = () => {
-            const [keyword, setKeyword] = React.useState('');
-            const rows = React.useMemo(() => {
-                const kw = (keyword || '').trim().toLowerCase();
-                const enriched = MASTER_BROKER_LIST.map(item => {
-                    const supports = getSupportsForRms(item.rms);
-                    return { ...item, supports };
-                });
-                if (!kw) return enriched;
-                return enriched.filter(r => {
-                    const hay = `${r.broker} ${(r.rms || []).join(' ')} ${(r.supports || []).join(' ')}`.toLowerCase();
-                    return hay.includes(kw);
-                });
-            }, [keyword]);
-            return (
-                <div className="p-4 md:p-6 h-full flex flex-col">
-                    <div className="flex flex-col md:flex-row md:items-center gap-3 mb-4">
-                        <div className="relative w-full md:max-w-xl">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                                <Search size={16} />
-                            </div>
-                            <input
-                                className="w-full pl-9 pr-10 py-2 rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-blue-200 focus:border-blue-500 outline-none"
-                                placeholder="Keyword search: Broker / RM / Support"
-                                value={keyword}
-                                onChange={(e) => setKeyword(e.target.value)}
-                            />
-                            {keyword ? (
-                                <button
-                                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
-                                    onClick={() => setKeyword('')}
-                                    title="Clear"
-                                >
-                                    <Trash2 size={16} />
-                                </button>
-                            ) : null}
-                        </div>
-                        <div className="text-sm text-slate-500 whitespace-nowrap">
-                            {rows.length} result{rows.length === 1 ? '' : 's'}
-                        </div>
-                    </div>
-                    <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex-1">
-                        <div className="h-full overflow-auto custom-scrollbar">
-                            <table className="min-w-full text-sm">
-                                <thead className="sticky top-0 bg-slate-50 border-b border-slate-200">
-                                    <tr className="text-left text-slate-600">
-                                        <th className="p-3 font-semibold">Broker Name</th>
-                                        <th className="p-3 font-semibold">RM</th>
-                                        <th className="p-3 font-semibold">Support</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {rows.map((row, idx) => (
-                                        <tr key={row.broker + idx} className="border-b border-slate-100 hover:bg-slate-50">
-                                            <td className="p-3 font-medium text-slate-800">{row.broker}</td>
-                                            <td className="p-3">
-                                                <div className="flex flex-wrap gap-1">
-                                                    {(row.rms || []).map((rm) => (
-                                                        <span key={rm} className="inline-flex items-center rounded-full bg-slate-100 text-slate-700 px-2 py-0.5">
-                                                            {rm}
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                            </td>
-                                            <td className="p-3">
-                                                {(row.supports || []).length ? (
-                                                    <div className="flex flex-wrap gap-1">
-                                                        {row.supports.map((sp) => (
-                                                            <span key={sp} className="inline-flex items-center rounded-full bg-blue-50 text-blue-700 px-2 py-0.5">
-                                                                {sp}
-                                                            </span>
-                                                        ))}
-                                                    </div>
-                                                ) : (
-                                                    <span className="text-slate-400">-</span>
-                                                )}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            );
-        };
 
                 // Country List updated based on country.txt
         const COUNTRY_LIST = [
@@ -2313,6 +2142,133 @@ const HK_HOLIDAYS_2025_2026 = [
             { prefix: '(FYI)', text: 'Payor will be required to submit Source(s) of Funds/Wealth Supplementary Information Questionnaire if premium payment is not fully made by proposed policyholder. Compliance review is also required' },
             { prefix: '(FYI)', text: 'Anonymous/cash payment is not allowed for high return products' }
         ];
+
+        /* ========== Master Broker List Data ========== */
+        // The master broker data is generated from the provided Master_Broker_List.txt. Each broker maps to one or more RMs and each RM maps to a list of support staff.
+        // This structure allows us to easily search by broker name, RM name or support name and display the hierarchy accordingly.
+        const MASTER_BROKER_DATA = {"10Life Financial Limited":{"JP":["Kayley"]},"1291 Group Asia Limited":{"Jessie":["Roy"]},"ACF International Insurance Broker Co., Limited":{"JP":["Kayley"]},"AEO Financial Serivices Limited":{"Lorraine":["Mathew"]},"AMG Wealth Management Limited":{"Kennis":["Mathew"]},"ASI-Union Global Assets Management Limited":{"Kennis":["Mathew"]},"Abacare Hong Kong Limited":{"Lorraine":["Mathew"]},"Abundance Global Wealth Management Limited":{"Lorraine":["Mathew"]},"Alea Insurance Ltd":{"Nik":["Kayley"]},"Alpha International Insurance Broker Limited":{"JP":["Kayley"]},"Alpha Wealth Management Limited":{"Kennis":["Mathew"]},"Altruist Financial Group Limited":{"Lorraine":["Mathew"]},"Amber Hill Insurance Brokers Limited":{"JP":["Kayley"]},"Ampire Wealth Management Limited":{"Nik":["Kayley"]},"Ample Financial And Insurance Services Limited":{"Lorraine":["Mathew"]},"Apeiron International (HK) Limited":{"Lorraine":["Mathew"]},"Apex Insurance Brokers Limited":{"Kennis":["Mathew"]},"Apex Insurance Management Limited":{"Kennis":["Mathew"]},"AutoMate Wealth Management Limited":{"Danny Wong":["Mathew"]},"Avondale Wealth Management Limited":{"Lorraine":["Mathew"]},"BMI Funds Management Limited":{"JP":["Kayley"]},"BMP Wealth Limited":{"Walter":["Kayley"]},"BS Wealth Management Limited":{"Walter":["Kayley"]},"Bao Sheng International Fortune Advisory Limited":{"JP":["Kayley"]},"Bay Insurance Brokers Limited":{"Danny Wong":["Mathew"]},"Bay Union Insurance Brokers Limited":{"JP":["Kayley"],"Lorraine":["Mathew"]},"Bay Wealth Management Limited":{"Danny Wong":["Mathew"]},"Ben.Excellence Consultancy Limited":{"Lorraine":["Mathew"]},"Best Managed Wealth Limited":{"Nik":["Kayley"]},"Best Managed Wealth Limited (TW)":{"Nik":["Kayley"]},"Better Wealth Management Company Limited":{"Walter":["Kayley"]},"Blue Oak International (HK) Insurance Consultant Limited":{"Rachel Tong":["Roy"]},"Blue Ocean Wealth Management (Hong Kong) Limited":{"JP":["Kayley"]},"Brilliant Asia Asset Management Limited":{"Nik":["Kayley"]},"Brilliant Insurance Broker Limited":{"JP":["Kayley"]},"Bureau of Insurance Services Limited":{"Walter":["Kayley"]},"CCW Global Limited":{"Walter":["Kayley"]},"CECO Wealth Management Limited":{"JP":["Kayley"]},"CES Insurance Consultants (HK) Limited":{"Jessie":["Roy"],"Rachel Tong":["Roy"]},"CES Wealth Management (HK) Limited":{"Jessie":["Roy"],"Rachel Tong":["Roy"]},"CITIC Insurance Brokers Limited":{"Jessie":["Roy"],"Rachel Tong":["Roy"]},"CM Houlder Insurance Brokers Limited":{"Susanna Chan":["Mathew"]},"CMB Wing Lung Insurance Brokers Limited":{"Jessie":["Roy"],"Rachel Tong":["Roy"]},"CSCI Insurance Broker Limited":{"Walter":["Kayley"]},"Cash Wealth Management Limited":{"Lorraine":["Mathew"]},"Centaline Financial Services Ltd.":{"Nik":["Kayley"]},"Charles Monat Associates Limited":{"Wing Qiu Liu":["Roy"]},"Charter Management Group Limited":{"Nik":["Kayley"]},"Chief Champion Financial Services Company Limited":{"Susanna Chan":["Mathew"]},"Chief Financial Services Limited":{"Kennis":["Mathew"]},"Chief Financial Services Limited (New)":{"Kennis":["Mathew"]},"Chifu Wealth Management (Hong Kong) Limited":{"Walter":["Kayley"]},"China Elite Risk Management and Actuarial Consulting Company Limited":{"Walter":["Kayley"]},"China Hong Kong Wealth Management Limited":{"Danny Wong":["Mathew"]},"Chong Hing Insurance Brokers Limited":{"Rachel Tong":["Roy"]},"Clearwater Valley Hong Kong Limited":{"Rachel Tong":["Roy"]},"Colman Li Consulting Limited":{"Jessie":["Roy"]},"Commonwealth Broker Limited":{"Danny Wong":["Mathew"]},"Connect Global Insurance Consultants Limited":{"Rachel Tong":["Roy"]},"Consolidated Marketing Group Int'l Wealth Management Ltd.":{"Jessie":["Roy"]},"Core Pacific - Yamaichi Wealth Management Ltd.":{"JP":["Kayley"]},"DC Insurance Consulting Limited":{"Danny Wong":["Mathew"]},"DL Emerald Wealth Management Limited":{"Susanna Chan":["Mathew"]},"Dah Sing Insurance Brokers Limited":{"Jessie":["Roy"]},"Daybetter Insurance Broker Limited":{"JP":["Kayley"]},"Delta Asia Wealth Management Limited":{"Lorraine":["Mathew"]},"Doo Insurance Broker HK Limited":{"JP":["Kayley"]},"Doxa Wealth Planning Limited":{"Kennis":["Mathew"]},"Dragon Wealth Management Limited":{"Danny Wong":["Mathew"]},"Dynasty Financial Group Limited":{"Nik":["Kayley"]},"Eastern Glorith Wealth Management Ltd.":{"JP":["Kayley"]},"Elitrix Wealth Management Limited":{"JP":["Kayley"]},"Empire Financial Services Centre Limited":{"JP":["Kayley"]},"Equator Asset Protection Limited":{"Nik":["Kayley"]},"Everbest Insurance and Financial Services Ltd.":{"Rachel Tong":["Roy"]},"Everest Global Wealth Management Limited":{"Lorraine":["Mathew"]},"Everlife Asset Enterprise Ltd.":{"Nik":["Kayley"]},"Everon Insurance Services Limited":{"Danny Wong":["Mathew"]},"Everwise Asset Enterprise Limited":{"Nik":["Kayley"]},"Excellent Wealth Management Limited":{"Lorraine":["Mathew"]},"FQ Life Wealth Management Limited":{"Nik":["Kayley"]},"FWD Financial Planning Limited":{"Walter":["Kayley"]},"Father Financial Planning Services Limited":{"Susanna Chan":["Mathew"]},"Financial One Platform Services Limited":{"Nik":["Kayley"]},"Finexis Advisory (HK) Limited":{"Walter":["Kayley"]},"First Shanghai Wealth Management Limited":{"Nik":["Kayley"]},"Forthright Wealth Management Limited":{"Danny Wong":["Mathew"]},"Fortunaire Financial Planning Limited":{"Jessie":["Roy"]},"Fortune Asset Management (HK) Ltd":{"Walter":["Kayley"]},"Fortune Financial Services Company Limited":{"Walter":["Kayley"]},"Fortune Freedoness Wealth Management Ltd.":{"Lorraine":["Mathew"]},"Fortune Insurance Broker Company Limited":{"Kennis":["Mathew"]},"Fortune Union Capital Management Limited":{"Lorraine":["Mathew"]},"Frontier Financial Advisory Services Limited":{"Kennis":["Mathew"]},"Fu Ren Financial Services Limited":{"JP":["Kayley"]},"Fubon Insurance Brokers Limited":{"Rachel Tong":["Roy"]},"Fulbright Wealth Management Limited":{"Lorraine":["Mathew"]},"GF Wealth Management (Hong Kong) Limited":{"Kennis":["Mathew"]},"GLF Wealth Management Ltd.":{"Lorraine":["Mathew"]},"GT Insurance Brokers Limited":{"Kennis":["Mathew"]},"Genuine Oriental Wealth Management Limited":{"Kennis":["Mathew"]},"Global Investment Advisors Limited":{"Lorraine":["Mathew"]},"Global Wealth Services Limited":{"Lorraine":["Mathew"]},"Globe Win Wealth Management Ltd.":{"Walter":["Kayley"]},"Glore Financial Services Limited":{"Kennis":["Mathew"]},"Glory Insurance (HONG KONG) Limited":{"JP":["Kayley"]},"Good Excel International Investment Ltd.":{"Nik":["Kayley"]},"Grandtag Financial Consultancy & Insurance Brokers Limited":{"Jessie":["Roy"]},"Great Value Wealth Management Limited":{"Walter":["Kayley"]},"HCYC Wealth Management (Asia) Co. Limited":{"Kennis":["Mathew"]},"HF Partners Limited":{"Walter":["Kayley"]},"Hanligent Wealth Management Company Limited":{"Lorraine":["Mathew"]},"Hanson Insurance Brokers Limited":{"Lorraine":["Mathew"]},"Hantec Insurance Broker Company Limited":{"Kennis":["Mathew"]},"Harvest Wealth Management Limited":{"JP":["Kayley"]},"Heng Yep International Wealth Management Limited":{"JP":["Kayley"]},"Himark Insurance Group Limited":{"Lorraine":["Mathew"]},"Hong Kong Ai Jia Wealth Management Limited":{"Kennis":["Mathew"]},"Hong Kong Baiji Financial Advisory Co Limited":{"Susanna Chan":["Mathew"]},"Hong Kong Friendly Consulting Limited":{"Kennis":["Mathew"]},"Hong Kong Noble Wealth Management Limited":{"Walter":["Kayley"]},"IAM Wealth Limited":{"Nik":["Kayley"]},"IPG Wealth Management Ltd.":{"Nik":["Kayley"]},"IPP Wealth Advisers Limited":{"Lorraine":["Mathew"]},"ISA Insurance Brokers Limited":{"Nik":["Kayley"]},"Infinity Financial Management Limited":{"JP":["Kayley"]},"Insu-value Insurance Consultants Limited":{"Lorraine":["Mathew"]},"Insurance 110 Company Limited":{"Walter":["Kayley"]},"International Planning Group Insurance Brokers, Limited":{"Wing Qiu Liu":["Roy"]},"JMC Professional Insurance Brokers HK Ltd":{"Walter":["Kayley"]},"JSS Insurance Brokerage (Asia) Limited":{"Wing Qiu Liu":["Roy"]},"Jiayu Insurance Finance Ltd":{"Walter":["Kayley"]},"Jucheng Insurance Broker Limited":{"JP":["Kayley"]},"Jumbo Alliance Funds Limited":{"Nik":["Kayley"]},"Jumbolife Limited":{"Jessie":["Roy"]},"Juvo Wealth Limited":{"Walter":["Kayley"]},"K U M Insurance Brokers Ltd.":{"Rachel Tong":["Roy"]},"KEEN EAGLE INSURANCE BROKERS LIMITED":{"Walter":["Kayley"]},"KGI Investments Management Limited":{"Nik":["Kayley"]},"KSY Speciality limited":{"Nik":["Kayley"]},"Kai Fung Insurance Brokers Limited":{"JP":["Kayley"]},"Kaiser Wealth Management Limited":{"Kennis":["Mathew"]},"Kingkey Privilege Wealth Management":{"Lorraine":["Mathew"]},"Kingstone International Wealth Management Limited":{"Susanna Chan":["Mathew"]},"Kinlou Insurance Broker (HK) Limited":{"Susanna Chan":["Mathew"]},"Kong Seng Asset Management Limited":{"JP":["Kayley"]},"L & P International Wealth Management Limited":{"JP":["Kayley"]},"L Green Specialty Company Limited":{"Lorraine":["Mathew"]},"L.M.W. Fortune Consultant Company Limited":{"Walter":["Kayley"]},"LCF Group HK Limited":{"Nik":["Kayley"]},"LMW MGT Limited":{"Walter":["Kayley"]},"Lal's Insurance Brokers Limited":{"Lorraine":["Mathew"]},"Linden Group Limited":{"Wing Qiu Liu":["Roy"]},"Links Wealth Management Limited":{"Kennis":["Mathew"]},"Lioner International Consultancy Limited":{"Wing Qiu Liu":["Roy"]},"Loksoo Consultants Limited":{"Kennis":["Mathew"]},"Longrun Wealth Management Limited":{"Kennis":["Mathew"]},"Loyal Insurance Advisers Limited":{"JP":["Kayley"]},"Luk Fook Wealth Management (HK) Limited":{"Kennis":["Mathew"]},"Lynco International Wealth Management Limited":{"Kennis":["Mathew"]},"MG Insurance & Financial Management Limited":{"JP":["Kayley"]},"MHK Insurance Services Limited":{"Nik":["Kayley"]},"MacKenzie Wealth Management Limited":{"Walter":["Kayley"]},"Macroscopica International Wealth Management Limited":{"Kennis":["Mathew"]},"Magic Compass Wealth Management Limited":{"Kennis":["Mathew"]},"Maison Aim Asset Management Limited":{"Walter":["Kayley"]},"Majesty Wealth Management Limited":{"Nik":["Kayley"]},"Manchester Insurance Consultants Limited":{"Lorraine":["Mathew"]},"Mass Fidelity Asset Management Limited":{"Kennis":["Mathew"]},"Midland Financial Planning Limited":{"Nik":["Kayley"]},"Money Concepts (Asia) Holdings Limited":{"JP":["Kayley"]},"More Insurance Broker Company Limited":{"Kennis":["Mathew"]},"NCB Wealth Management Advisor Limited":{"Rachel Tong":["Roy"]},"New Century International Insurance Advisory Ltd":{"Lorraine":["Mathew"]},"New Harvest Wealth Insurance Brokers (HK) Limited":{"Kennis":["Mathew"]},"New Universe Pacific Financial Management Limited":{"JP":["Kayley"]},"Noble Apex Wealth Limited":{"JP":["Kayley"]},"Nut Nut Intelligence Limited":{"JP":["Kayley"]},"One Plus Insurance Service Limited":{"Susanna Chan":["Mathew"]},"Oneplatform Wealth Management Limited":{"Kennis":["Mathew"]},"Oreana Financial Services Limited":{"Lorraine":["Mathew"]},"P.B. Wealth Management Ltd":{"JP":["Kayley"]},"PC International (HK) Limited":{"Kennis":["Mathew"]},"PCL Insurance Services Limited":{"Walter":["Kayley"]},"PLA (Hong Kong) Ltd":{"Lorraine":["Mathew"]},"PT insurance Brokers Company Limited":{"Kennis":["Mathew"]},"Pacific Prime Insurance Brokers Limited":{"Lorraine":["Mathew"]},"Pegasus Fund Managers Limited":{"Lorraine":["Mathew"]},"Penguin Insurance Co., Limited":{"Kennis":["Mathew"]},"Perfect Life Insurance Brokers Limited":{"Walter":["Kayley"]},"Phillip Financial Advisors (HK) Limited":{"Walter":["Kayley"]},"Premier Financial Management Limited":{"Lorraine":["Mathew"]},"Prestige Global Wealth Management Limited":{"Lorraine":["Mathew"]},"Prime Wealth Management Limited":{"Walter":["Kayley"]},"Private Client Services by Mercer Limited":{"Wing Qiu Liu":["Roy"]},"Private Portfolio Services (HK) Ltd.":{"Kennis":["Mathew"]},"Pro Insurance & Financial Management Limited":{"Walter":["Kayley"]},"Pyrmont Wealth Management Limited":{"Walter":["Kayley"]},"Queensway Asset Management Limited":{"JP":["Kayley"]},"R.C.W. Financial Services Limited":{"Nik":["Kayley"]},"R.E. Lee International Limited":{"Wing Qiu Liu":["Roy"]},"Raffles Capital Holings Limited":{"Nik":["Kayley"]},"Realife Insurance Broker Limited":{"JP":["Kayley"]},"Realord Asia Pacific Asset Management Limited":{"JP":["Kayley"]},"Rhoba Financial Services Limited":{"Walter":["Kayley"]},"Riches Credit Insurance Brokerage Limited":{"JP":["Kayley"]},"SESG Insurance Services Limited":{"JP":["Kayley"]},"Sandcastle Management Limited":{"Susanna Chan":["Mathew"]},"Shacom Insurance Brokers Limited":{"Lorraine":["Mathew"]},"Shengyuan Global Wealth Management Company Limited":{"Nik":["Kayley"]},"Shining Solutions Wealth Management Limited":{"Kennis":["Mathew"]},"Shorewell Insurance Brokers Ltd":{"Rachel Tong":["Roy"]},"Sincerity Insurance Brokers Limited":{"Walter":["Kayley"]},"St. James’s Place (Hong Kong) Limited":{"Walter":["Kayley"]},"Star Flame Asset Management Limited":{"Michael":["Mathew"]},"Supreme One Wealth Mangagement Limited":{"Lorraine":["Mathew"]},"Supreme Wealth Management Limited":{"JP":["Kayley"]},"Synergy Wealth Management Limited":{"JP":["Kayley"]},"Taifu Asset Management Limited":{"Kennis":["Mathew"]},"Taiping Reinsurance Brokers Limited":{"Danny Wong":["Mathew"]},"Taishan Insurance Brokers Ltd":{"Lorraine":["Mathew"]},"Taoyuen Insurance Services Limited":{"JP":["Kayley"]},"Target Global Wealth Management Limited":{"Kennis":["Mathew"]},"Taylor Brunswick Group Limited":{"Wing Qiu Liu":["Roy"]},"Tek Fong Group Limited":{"JP":["Kayley"]},"Tengard Financial Services Ltd":{"Kennis":["Mathew"]},"Tenti Wealth Management Company Limited":{"Walter":["Kayley"]},"The LOG International Limited":{"Lorraine":["Mathew"]},"Thornton Global Wealth Management Limited":{"Kennis":["Mathew"]},"Tinco Wealth Management Limited":{"Susanna Chan":["Mathew"]},"Top Integrity Financial Services Limited":{"Lorraine":["Mathew"]},"Top One Global Wealth Management Limited":{"Kennis":["Mathew"]},"Topaz Private Wealth Limited":{"Kennis":["Mathew"]},"Trusted Union Limited":{"Lorraine":["Mathew"]},"Tung Chi Consulting Limited":{"Walter":["Kayley"]},"UHO International Wealth Management Co. Ltd.":{"Walter":["Kayley"]},"Universal Alliance Group Limited":{"Walter":["Kayley"]},"Venhouse Financial Planning Limited":{"JP":["Kayley"]},"Victoria Wealth Management Limited":{"Kennis":["Mathew"]},"Victory Insurance Consultants Limited":{"Lorraine":["Mathew"]},"Village Holdings Limited":{"Jessie":["Roy"]},"WE Financial Planning Limited":{"Kennis":["Mathew"]},"WE Wealth Management Limited":{"JP":["Kayley"]},"Wanson Insurance Brokerage Limited":{"Walter":["Kayley"]},"Waterdrop Financial Services (HK) Limited":{"JP":["Kayley"]},"Well Tunes Financial Group Limited":{"Walter":["Kayley"]},"Wickfield Insurance Brokers Limited":{"JP":["Kayley"]},"Wilson Securities Limited":{"JP":["Kayley"]},"Win Finance Wealth Management Limited":{"Danny Wong":["Mathew"]},"Winroad Asia Limited":{"Walter":["Kayley"]},"Winson Insurance Consultants Limited":{"JP":["Kayley"]},"Wisdom Alliance Wealth Management Ltd.":{"Nik":["Kayley"]},"Wisdom Global Concept Limited":{"JP":["Kayley"]},"Wise Fortune Advisors Limited":{"Nik":["Kayley"]},"Wrise Financial Services Limited":{"Lorraine":["Mathew"],"Walter":["Kayley"]},"Yotei Advisors (HK) Limited":{"Lorraine":["Mathew"]},"Yu Fung Broker Limited":{"Walter":["Kayley"]},"Yuanta Securities (Hong Kong) Company Limited":{"Nik":["Kayley"]},"Yushuan Wealth Management Limited":{"Nik":["Kayley"]},"ZA International Insurance Broker Limited":{"Agent Channel (Windian)": [""]},"ZUU Digital Financial Services Limited":{"Walter":["Kayley"]},"ZUU Insurance Brokerage Limited":{"Walter":["Kayley"]},"iFAST Insurance Brokers (HK) Limited":{"Lorraine":["Mathew"]}};
+
+        /* ========== Country Group Map (Sample) ========== */
+        // Country group information is used in the HNW (LionMaster) module. Each country maps to a group label, an issue limit (in USD)
+        // and any eligible city restrictions. The below sample covers common jurisdictions. Unknown entries default to group 'N/A' and limit 30M.
+        // Updated country group map based on Country Group manual. Each entry includes the group, the USD issue limit and any eligible city restrictions.
+        const COUNTRY_GROUP_MAP = {
+            "All of British Isles": { group: "A", issueLimit: 30000000, eligibleCities: "" },
+            "Andorra": { group: "A", issueLimit: 30000000, eligibleCities: "" },
+            "Argentina": { group: "A", issueLimit: 30000000, eligibleCities: "" },
+            "Australia": { group: "A", issueLimit: 100000000, eligibleCities: "" },
+            "Austria": { group: "A", issueLimit: 100000000, eligibleCities: "" },
+            "Bahamas": { group: "B", issueLimit: 30000000, eligibleCities: "" },
+            "Bahrain": { group: "B", issueLimit: 30000000, eligibleCities: "" },
+            "Bangladesh": { group: "C", issueLimit: 5000000, eligibleCities: "Dhaka only" },
+            "Brazil": { group: "B", issueLimit: 30000000, eligibleCities: "" },
+            "Belgium": { group: "A", issueLimit: 100000000, eligibleCities: "" },
+            "Belize": { group: "C", issueLimit: 30000000, eligibleCities: "" },
+            "Bermuda": { group: "A", issueLimit: 30000000, eligibleCities: "" },
+            "British Virgin Islands": { group: "B", issueLimit: 30000000, eligibleCities: "" },
+            "Brunei": { group: "A", issueLimit: 35000000, eligibleCities: "" },
+            "Bulgaria": { group: "B", issueLimit: 30000000, eligibleCities: "" },
+            "Canary Island": { group: "B", issueLimit: 30000000, eligibleCities: "" },
+            "Cayman Islands": { group: "A", issueLimit: 30000000, eligibleCities: "" },
+            "Chile": { group: "A", issueLimit: 30000000, eligibleCities: "" },
+            "China": { group: "A", issueLimit: 100000000, eligibleCities: "All except Xinjiang and Tibet" },
+            "Cambodia": { group: "C", issueLimit: 10000000, eligibleCities: "" },
+            "Canada": { group: "A", issueLimit: 100000000, eligibleCities: "" },
+            "Costa Rica": { group: "A", issueLimit: 30000000, eligibleCities: "" },
+            "Curacao": { group: "B", issueLimit: 30000000, eligibleCities: "" },
+            "Cyprus (Greek Cyprus)": { group: "A", issueLimit: 30000000, eligibleCities: "" },
+            "Czech Republic": { group: "A", issueLimit: 30000000, eligibleCities: "" },
+            "Denmark": { group: "A", issueLimit: 100000000, eligibleCities: "" },
+            "Dominica": { group: "B", issueLimit: 30000000, eligibleCities: "" },
+            "Egypt": { group: "B", issueLimit: 30000000, eligibleCities: "War exclusion" },
+            "Estonia": { group: "B", issueLimit: 15000000, eligibleCities: "" },
+            "Fiji": { group: "B", issueLimit: 30000000, eligibleCities: "" },
+            "Finland": { group: "A", issueLimit: 100000000, eligibleCities: "" },
+            "France": { group: "A", issueLimit: 100000000, eligibleCities: "" },
+            "Germany": { group: "A", issueLimit: 100000000, eligibleCities: "" },
+            "Greece": { group: "A", issueLimit: 30000000, eligibleCities: "" },
+            "Greenland": { group: "B", issueLimit: 30000000, eligibleCities: "" },
+            "Honduras": { group: "B", issueLimit: 10000000, eligibleCities: "" },
+            "Hong Kong": { group: "A", issueLimit: 100000000, eligibleCities: "" },
+            "Hungary": { group: "B", issueLimit: 30000000, eligibleCities: "" },
+            "Iceland": { group: "A", issueLimit: 100000000, eligibleCities: "" },
+            "India": { group: "B", issueLimit: 30000000, eligibleCities: "Ahmedabad, Bangalore, Chennai, Faridabad, Hyderabad, Jaipur, Kolkata, Lucknow, Mysore, Mumbai, New Delhi and Pune only" },
+            "Indonesia": { group: "B", issueLimit: 45000000, eligibleCities: "All except Central Sulawesi, Maluku, Papua and West Papua provinces" },
+            "Ireland": { group: "A", issueLimit: 100000000, eligibleCities: "" },
+            "Israel": { group: "B", issueLimit: 5000000, eligibleCities: "War exclusion; All except West Bank & Gaza Strip" },
+            "Italy": { group: "A", issueLimit: 100000000, eligibleCities: "" },
+            "Jamaica": { group: "B", issueLimit: 30000000, eligibleCities: "" },
+            "Japan": { group: "A", issueLimit: 100000000, eligibleCities: "All except Aomori, Iwate, Miyagi, Fukushima" },
+            "Jordan": { group: "B", issueLimit: 30000000, eligibleCities: "" },
+            "Kuwait": { group: "B", issueLimit: 30000000, eligibleCities: "" },
+            "Laos": { group: "C", issueLimit: 5000000, eligibleCities: "" },
+            "Latvia": { group: "B", issueLimit: 30000000, eligibleCities: "" },
+            "Lebanon": { group: "War exclusion", issueLimit: 30000000, eligibleCities: "" },
+            "Liechtenstein": { group: "A", issueLimit: 100000000, eligibleCities: "" },
+            "Lithuania": { group: "B", issueLimit: 30000000, eligibleCities: "" },
+            "Luxembourg": { group: "A", issueLimit: 100000000, eligibleCities: "" },
+            "Macau": { group: "A", issueLimit: 100000000, eligibleCities: "" },
+            "Malaysia": { group: "B", issueLimit: 50000000, eligibleCities: "" },
+            "Maldives": { group: "B", issueLimit: 30000000, eligibleCities: "" },
+            "Malta": { group: "B", issueLimit: 30000000, eligibleCities: "" },
+            "Martinique": { group: "B", issueLimit: 30000000, eligibleCities: "" },
+            "Mauritius": { group: "B", issueLimit: 30000000, eligibleCities: "" },
+            "Mexico": { group: "B", issueLimit: 30000000, eligibleCities: "" },
+            "Monaco": { group: "B", issueLimit: 30000000, eligibleCities: "" },
+            "Montserrat": { group: "B", issueLimit: 30000000, eligibleCities: "" },
+            "Morocco": { group: "B", issueLimit: 30000000, eligibleCities: "" },
+            "Myanmar": { group: "C", issueLimit: 5000000, eligibleCities: "Yangon only" },
+            "Netherlands": { group: "A", issueLimit: 100000000, eligibleCities: "" },
+            "Netherlands Antilles": { group: "B", issueLimit: 30000000, eligibleCities: "" },
+            "New Caledonia": { group: "B", issueLimit: 10000000, eligibleCities: "" },
+            "New Zealand": { group: "A", issueLimit: 100000000, eligibleCities: "" },
+            "Northern Mariana Islands": { group: "B", issueLimit: 30000000, eligibleCities: "" },
+            "Norway": { group: "A", issueLimit: 100000000, eligibleCities: "" },
+            "Oman": { group: "B", issueLimit: 50000000, eligibleCities: "" },
+            "Pakistan": { group: "C", issueLimit: 10000000, eligibleCities: "Karachi only" },
+            "Panama": { group: "B", issueLimit: 30000000, eligibleCities: "" },
+            "Paraguay": { group: "B", issueLimit: 30000000, eligibleCities: "" },
+            "Peru": { group: "B", issueLimit: 30000000, eligibleCities: "" },
+            "Philippines": { group: "B", issueLimit: 45000000, eligibleCities: "All except Central & Western Mindanao (including Zamboanga Peninsula and Sulu Archipelago)" },
+            "Poland": { group: "B", issueLimit: 30000000, eligibleCities: "" },
+            "Portugal": { group: "A", issueLimit: 100000000, eligibleCities: "" },
+            "Puerto Rico": { group: "A", issueLimit: 30000000, eligibleCities: "" },
+            "Qatar": { group: "B", issueLimit: 45000000, eligibleCities: "" },
+            "Romania": { group: "B", issueLimit: 30000000, eligibleCities: "" },
+            "Russia": { group: "C", issueLimit: 30000000, eligibleCities: "Moscow and St Petersburg only" },
+            "San Marino": { group: "A", issueLimit: 30000000, eligibleCities: "" },
+            "Saudi Arabia": { group: "B", issueLimit: 45000000, eligibleCities: "" },
+            "Singapore": { group: "A", issueLimit: 100000000, eligibleCities: "" },
+            "Slovakia": { group: "A", issueLimit: 30000000, eligibleCities: "" },
+            "Solomon Island": { group: "C", issueLimit: 10000000, eligibleCities: "" },
+            "South Africa": { group: "B", issueLimit: 30000000, eligibleCities: "Pretoria, Johannesburg and Cape Town only" },
+            "South Korea": { group: "A", issueLimit: 100000000, eligibleCities: "" },
+            "Spain": { group: "A", issueLimit: 100000000, eligibleCities: "" },
+            "Sri Lanka": { group: "C", issueLimit: 10000000, eligibleCities: "" },
+            "St Kitts & Nevis": { group: "B", issueLimit: 30000000, eligibleCities: "" },
+            "St Lucia": { group: "B", issueLimit: 30000000, eligibleCities: "" },
+            "St Vincent/Grenadines": { group: "B", issueLimit: 30000000, eligibleCities: "" },
+            "Sweden": { group: "A", issueLimit: 100000000, eligibleCities: "" },
+            "Switzerland": { group: "A", issueLimit: 100000000, eligibleCities: "" },
+            "Taiwan": { group: "A", issueLimit: 100000000, eligibleCities: "" },
+            "Thailand": { group: "B", issueLimit: 45000000, eligibleCities: "All except Yala, Pattani, Narathiwat & Songkhla" },
+            "Tonga": { group: "B", issueLimit: 30000000, eligibleCities: "" },
+            "Trinidad/Tobago": { group: "B", issueLimit: 30000000, eligibleCities: "" },
+            "Turkey": { group: "B", issueLimit: 30000000, eligibleCities: "" },
+            "Turks & Caicos Islands": { group: "B", issueLimit: 30000000, eligibleCities: "" },
+            "United Arab Emirates": { group: "B", issueLimit: 50000000, eligibleCities: "" },
+            "United Kingdom": { group: "A", issueLimit: 100000000, eligibleCities: "" },
+            "United States": { group: "A", issueLimit: 100000000, eligibleCities: "" },
+            "Uruguay": { group: "B", issueLimit: 30000000, eligibleCities: "" },
+            "Vatican City": { group: "A", issueLimit: 30000000, eligibleCities: "" },
+            "Venezuela": { group: "B", issueLimit: 30000000, eligibleCities: "" },
+            "Vietnam": { group: "B", issueLimit: 45000000, eligibleCities: "Danang, Hanoi, Ho Chi Minh City, Haiphong only" },
+            "Virgin Islands": { group: "B", issueLimit: 30000000, eligibleCities: "" }
+        };
+
+        /* ========== HNW Options ========== */
+        const HNW_CLASS_OPTIONS = ["Non-Med", "Bravo", "Supremo", "Picco"];
+        const HNW_SMOKING_OPTIONS = ["Non-smoker", "Smoker"];
         // ==========================================
         // Jumbo Case (大額保單) Constants
         // ==========================================
@@ -2338,7 +2294,7 @@ const HK_HOLIDAYS_2025_2026 = [
             // Annuity
             { name: "LionHarvest Prime", type: "Annuity", q1: "Must: C and/or D === Optional: A", q2: "E, F", q6: "Must be equal or greater than payment term", ruleType: "GIO" }
             ,
-            // [UPDATE v2.9.1] High Net Worth plan for LionMaster
+            // [NEW] High Net Worth product
             { name: "LionMaster", type: "HNW", q1: "", q2: "", q6: "", ruleType: "HNW" }
         ];
 
@@ -3031,7 +2987,7 @@ const HK_HOLIDAYS_2025_2026 = [
                         pfLoanRate,
                         pfLoanTenor,
                         // [UPDATE v2.8] persist PF repayment amount
-                        pfRepaymentAmount
+                        pfRepaymentAmount,
                     };
                     localStorage.setItem('affordabilityFullState', JSON.stringify(full));
                 } catch (err) {
@@ -3242,8 +3198,7 @@ const HK_HOLIDAYS_2025_2026 = [
                             else if (data.payMode === 'Annual' || data.payMode === 'Prepay' || data.payMode === 'Single') factor = 1;
                         }
                         copiedPremium = copiedPremium * factor;
-                        // Determine payType based on payMode; only the explicit Single pay mode is treated as Single Pay
-                        // Prepay should be treated the same as Regular Pay in affordability calculations
+                        // Determine payType based on payMode; Prepay is treated as Regular Pay (not Single)
                         const copiedPayType = (data.payMode === 'Single') ? 'Single' : 'Regular';
                         newPolicies[applyingPolicyIndex] = {
                             ...newPolicies[applyingPolicyIndex],
@@ -3265,8 +3220,7 @@ const HK_HOLIDAYS_2025_2026 = [
                             else if (data.payMode === 'Annual' || data.payMode === 'Prepay' || data.payMode === 'Single') factor2 = 1;
                         }
                         annPrem = annPrem * factor2;
-                        // Determine payType for the new policy
-                        // Only the explicit Single pay mode counts as Single Pay; Prepay is mapped to Regular Pay
+                        // Determine payType for the new policy; Prepay maps to Regular Pay
                         const newPayType = (data.payMode === 'Single') ? 'Single' : 'Regular';
                         setPolicies([...policies, { 
                             id: newId, 
@@ -3706,89 +3660,28 @@ const [addressProofType, setAddressProofType] = useState('');
 
             const [showSuggestions, setShowSuggestions] = useState(false);
 
-            // ===== HNW LionMaster Modal States =====
-            const [isHnwModalOpen, setIsHnwModalOpen] = useState(false);
-            const [hnwSignDate, setHnwSignDate] = useState("");
+            // ====== HNW (LionMaster) fields ======
+            // When the plan is LionMaster, these fields capture the high-net-worth inputs. They are kept separate
+            // from the generic policy fields to avoid interference with normal plans.
+            const [hnwAppSignDate, setHnwAppSignDate] = useState("");
             const [hnwDOB, setHnwDOB] = useState("");
-            const [hnwAge, setHnwAge] = useState("");
             const [hnwGender, setHnwGender] = useState("M");
-            const [hnwSmoking, setHnwSmoking] = useState("");
-            const [hnwClass, setHnwClass] = useState("");
+            const [hnwSmoking, setHnwSmoking] = useState("Non-smoker");
+            const [hnwClass, setHnwClass] = useState("Non-Med");
             const [hnwNationality, setHnwNationality] = useState("");
             const [hnwResidency, setHnwResidency] = useState("");
             const [hnwSumAssured, setHnwSumAssured] = useState("");
-            const [hnwTerm, setHnwTerm] = useState("");
+            const [hnwTerms, setHnwTerms] = useState("");
             const [hnwAnnualPremium, setHnwAnnualPremium] = useState("");
-            const [hnwExistingCoverage, setHnwExistingCoverage] = useState("");
+            const [hnwExistingSA, setHnwExistingSA] = useState("");
             const [hnwOccupation, setHnwOccupation] = useState("");
             const [hnwMedically, setHnwMedically] = useState("");
             const [hnwFinancially, setHnwFinancially] = useState("");
-            const [hnwSummary, setHnwSummary] = useState("");
+            const [hnwSummaryText, setHnwSummaryText] = useState("");
             const [hnwWarnings, setHnwWarnings] = useState([]);
 
-            // Auto compute age based on sign date and DOB
-            useEffect(() => {
-                if (hnwDOB && hnwSignDate) {
-                    try {
-                        const dobDate = new Date(hnwDOB);
-                        const signDate = new Date(hnwSignDate);
-                        let age = signDate.getFullYear() - dobDate.getFullYear();
-                        const m = signDate.getMonth() - dobDate.getMonth();
-                        if (m < 0 || (m === 0 && signDate.getDate() < dobDate.getDate())) {
-                            age--;
-                        }
-                        setHnwAge(isNaN(age) ? "" : age.toString());
-                    } catch (err) {
-                        setHnwAge("");
-                    }
-                } else {
-                    setHnwAge("");
-                }
-            }, [hnwDOB, hnwSignDate]);
-
-            // Simple HNW validation warnings based on sum assured and age
-            useEffect(() => {
-                const warnings = [];
-                const sum = parseFloat(hnwSumAssured) || 0;
-                const ageNum = parseInt(hnwAge) || 0;
-                if (sum > 10000000) {
-                    warnings.push('Sum Assured exceeds USD 10,000,000; special financial underwriting may be required.');
-                }
-                if (ageNum > 55 && sum > 5000000) {
-                    warnings.push('High sum assured over USD 5,000,000 for age > 55 may trigger additional medical requirements.');
-                }
-                setHnwWarnings(warnings);
-            }, [hnwSumAssured, hnwAge]);
-
-            const handleHnwResidencyChange = (val) => {
-                setHnwResidency(val);
-            };
-
-            const handleRunHnwSummary = () => {
-                // Compute total sum assured including existing coverage
-                const sa = parseFloat(hnwSumAssured) || 0;
-                const existing = parseFloat(hnwExistingCoverage) || 0;
-                const totalSa = sa + existing;
-                // Find group info from COUNTRY_GROUP_DATA
-                const groupData = COUNTRY_GROUP_DATA.find(c => c.country === hnwResidency) || {};
-                const groupLabel = groupData.group ? `Group ${groupData.group}` : '';
-                const summaryLines = [];
-                summaryLines.push(`Applying LionMaster USD ${hnwSumAssured || ''} - ${hnwClass || ''} - ${hnwTerm || ''} (${hnwAnnualPremium || ''})`);
-                summaryLines.push('');
-                summaryLines.push(`${hnwGender}/${hnwAge || ''}/${hnwSmoking || ''}`);
-                summaryLines.push(`${hnwOccupation || ''}`);
-                summaryLines.push(`${hnwNationality || ''}`);
-                summaryLines.push(`${hnwResidency || ''}`);
-                summaryLines.push(`Country Rate - ${groupLabel}`);
-                summaryLines.push('');
-                summaryLines.push('Medically,');
-                summaryLines.push(hnwMedically || '');
-                summaryLines.push('');
-                summaryLines.push('Financially,');
-                summaryLines.push(`TSA (All): USD ${totalSa ? totalSa.toString() : ''}`);
-                summaryLines.push(hnwFinancially || '');
-                setHnwSummary(summaryLines.join('\n'));
-            };
+            // [v2.8.3 Enhancement] Capture annual income for HNW income requirement calculation
+            const [hnwAnnualIncome, setHnwAnnualIncome] = useState("");
 
             // ===== v2.0 Export/Import Hydration (Policy Input) =====
             const [policyHydrated, setPolicyHydrated] = useState(false);
@@ -3829,6 +3722,24 @@ const [addressProofType, setAddressProofType] = useState('');
                         if (s.insGender !== undefined) setInsGender(s.insGender);
                         if (s.insSmoker !== undefined) setInsSmoker(s.insSmoker);
                         if (s.insResidency !== undefined) setInsResidency(s.insResidency);
+
+                    // === HNW (LionMaster) persisted fields ===
+                    // When hydrating from localStorage, restore the values for the HNW module if they exist in saved state.
+                    if (s.hnwAppSignDate !== undefined) setHnwAppSignDate(s.hnwAppSignDate);
+                    if (s.hnwDOB !== undefined) setHnwDOB(s.hnwDOB);
+                    if (s.hnwGender !== undefined) setHnwGender(s.hnwGender);
+                    if (s.hnwSmoking !== undefined) setHnwSmoking(s.hnwSmoking);
+                    if (s.hnwClass !== undefined) setHnwClass(s.hnwClass);
+                    if (s.hnwNationality !== undefined) setHnwNationality(s.hnwNationality);
+                    if (s.hnwResidency !== undefined) setHnwResidency(s.hnwResidency);
+                    if (s.hnwSumAssured !== undefined) setHnwSumAssured(s.hnwSumAssured);
+                    if (s.hnwTerms !== undefined) setHnwTerms(s.hnwTerms);
+                    if (s.hnwAnnualPremium !== undefined) setHnwAnnualPremium(s.hnwAnnualPremium);
+                    if (s.hnwExistingSA !== undefined) setHnwExistingSA(s.hnwExistingSA);
+                    if (s.hnwOccupation !== undefined) setHnwOccupation(s.hnwOccupation);
+                    if (s.hnwMedically !== undefined) setHnwMedically(s.hnwMedically);
+                    if (s.hnwFinancially !== undefined) setHnwFinancially(s.hnwFinancially);
+                    if (s.hnwAnnualIncome !== undefined) setHnwAnnualIncome(s.hnwAnnualIncome);
 
                         // Plan / premium
                         if (s.planName !== undefined) setPlanName(s.planName);
@@ -3970,7 +3881,24 @@ const [addressProofType, setAddressProofType] = useState('');
                         pfLoanAmount,
                         pfLoanRate,
                         pfLoanTenor,
-                        pfRepaymentAmount
+                        pfRepaymentAmount,
+
+                    // Persist HNW (LionMaster) fields so that they are restored upon reload
+                    hnwAppSignDate,
+                    hnwDOB,
+                    hnwGender,
+                    hnwSmoking,
+                    hnwClass,
+                    hnwNationality,
+                    hnwResidency,
+                    hnwSumAssured,
+                    hnwTerms,
+                    hnwAnnualPremium,
+                    hnwExistingSA,
+                    hnwOccupation,
+                    hnwMedically,
+                    hnwFinancially,
+                    hnwAnnualIncome
                     };
                     localStorage.setItem('policyInputFullState', JSON.stringify(full));
                 } catch (err) {
@@ -3989,6 +3917,9 @@ const [addressProofType, setAddressProofType] = useState('');
                 trustBeneficiaries, unpaidPremium, reasonPurchaseHK, otherInsurances,
                 // dependencies for PF fields
                 isPremiumFinancing, pfLoanAmount, pfLoanRate, pfLoanTenor, pfRepaymentAmount,
+                // HNW fields dependencies
+                hnwAppSignDate, hnwDOB, hnwGender, hnwSmoking, hnwClass, hnwNationality, hnwResidency,
+                hnwSumAssured, hnwTerms, hnwAnnualPremium, hnwExistingSA, hnwOccupation, hnwMedically, hnwFinancially, hnwAnnualIncome,
                 policyHydrated
             ]);
             // =========================================================
@@ -4021,6 +3952,123 @@ const [addressProofType, setAddressProofType] = useState('');
             // - If Policyholder != Insured: insuredAgeForCalc == insAge (derived from Insured DOB)
             const insuredAgeForCalc = isSamePerson ? phAge : insAge;
 
+            // Compute HNW age based on DOB and application sign date
+            const hnwAge = useMemo(() => {
+                if (!hnwDOB || !hnwAppSignDate) return "";
+                return calculateAge(hnwDOB, hnwAppSignDate);
+            }, [hnwDOB, hnwAppSignDate]);
+
+            // Update HNW warnings whenever relevant fields change
+            useEffect(() => {
+                const warnings = [];
+                const sa = parseFloat(hnwSumAssured || 0);
+                const age = hnwAge;
+                // Issue limit check based on residency
+                const limit = (hnwResidency && COUNTRY_GROUP_MAP[hnwResidency]) ? COUNTRY_GROUP_MAP[hnwResidency].issueLimit : 30000000;
+                if (sa > 0 && sa > limit) {
+                    warnings.push(`Sum Assured exceeds issue limit (${formatMoney(limit, 'USD')}) for ${hnwResidency}`);
+                }
+                // Income requirement check based on annual income and age
+                const annualIncome = parseFloat(hnwAnnualIncome || 0);
+                if (!isNaN(annualIncome) && annualIncome > 0 && age !== "") {
+                    const multiplier = Math.min(Math.max(75 - age, 0), 35); // capped at 35
+                    const maxSaByIncome = annualIncome * multiplier;
+                    if (maxSaByIncome > 0 && sa > maxSaByIncome) {
+                        warnings.push(`Sum Assured exceeds income requirement maximum (${formatMoney(maxSaByIncome, 'USD')})`);
+                    }
+                }
+                // Financial requirements based on detailed thresholds (non private bank clients)
+                if (sa > 0) {
+                    if (sa <= 1500000) {
+                        warnings.push('Financial requirement: Financial questionnaire required.');
+                    } else if (sa <= 3000000) {
+                        warnings.push("Financial requirement: Financial questionnaire + broker's report required.");
+                    } else if (sa <= 7500000) {
+                        warnings.push("Financial requirement: Financial questionnaire + broker's report required.");
+                    } else if (sa <= 45000000) {
+                        warnings.push("Financial requirement: Financial questionnaire + broker's report + supporting financial evidence required.");
+                    } else {
+                        warnings.push("Financial requirement: Financial questionnaire + broker's report + supporting financial evidence required.");
+                    }
+                }
+                // Medical requirements based on age and sum assured thresholds from Routine Medical Requirements Table
+                if (sa > 0) {
+                    // Only calculate if age is available
+                    if (age !== "") {
+                        const ageNum = age;
+                        // Age 18-45 inclusive
+                        if (ageNum <= 45) {
+                            if (sa <= 1500000) {
+                                warnings.push('Medical requirement: ME, MU, FBP required.');
+                            } else if (sa <= 5000000) {
+                                warnings.push('Medical requirement: ME, MU, FBP, ECG required.');
+                            } else if (sa <= 10000000) {
+                                warnings.push('Medical requirement: ME, MU, FBP, ECG required.');
+                            } else if (sa <= 30000000) {
+                                warnings.push('Medical requirement: ME, MU, FBP, TMX required.');
+                            } else {
+                                warnings.push('Medical requirement: ME, MU, FBP, TMX, APS required.');
+                            }
+                        // Age 46-55 inclusive
+                        } else if (ageNum <= 55) {
+                            if (sa <= 2000000) {
+                                warnings.push('Medical requirement: ME, MU, FBP required.');
+                            } else if (sa <= 5000000) {
+                                warnings.push('Medical requirement: ME, MU, FBP, ECG required.');
+                            } else if (sa <= 10000000) {
+                                warnings.push('Medical requirement: ME, MU, FBP, ECG required.');
+                            } else if (sa <= 30000000) {
+                                warnings.push('Medical requirement: ME, MU, FBP, TMX required.');
+                            } else {
+                                warnings.push('Medical requirement: ME, MU, FBP, TMX, APS required.');
+                            }
+                        // Age over 55
+                        } else {
+                            if (sa <= 2000000) {
+                                warnings.push('Medical requirement: ME, MU, FBP, ECG required.');
+                            } else if (sa <= 5000000) {
+                                warnings.push('Medical requirement: ME, MU, FBP, ECG required.');
+                            } else if (sa <= 10000000) {
+                                warnings.push('Medical requirement: ME, MU, FBP, TMX required.');
+                            } else if (sa <= 30000000) {
+                                warnings.push('Medical requirement: ME, MU, FBP, TMX, APS required.');
+                            } else {
+                                warnings.push('Medical requirement: ME, MU, FBP, TMX, APS required.');
+                            }
+                        }
+                    } else {
+                        // Age unavailable: default minimal medical requirement
+                        warnings.push('Medical requirement: ME, MU, FBP required.');
+                    }
+                }
+                setHnwWarnings(warnings);
+            }, [hnwSumAssured, hnwAge, hnwClass, hnwSmoking, hnwResidency, hnwAnnualIncome]);
+
+            // Handler to generate HNW case summary for LionMaster. It composes the output according to the
+            // specified format and stores it in hnwSummaryText so that the UI can display and copy it.
+            const handleRunHnwSummary = () => {
+                const sa = Number(hnwSumAssured || 0);
+                const existing = Number(hnwExistingSA || 0);
+                const group = (hnwResidency && COUNTRY_GROUP_MAP[hnwResidency]) ? COUNTRY_GROUP_MAP[hnwResidency].group : '';
+                const total = sa + existing;
+                const summary =
+`Applying LionMaster USD ${sa.toLocaleString()} - ${hnwClass} - ${hnwTerms} (${hnwAnnualPremium})
+
+${hnwGender}/${hnwAge}/${hnwSmoking}
+${hnwOccupation || ''}
+${hnwNationality || ''}
+${hnwResidency || ''}
+Country Rate - Group ${group}
+
+Medically,
+${hnwMedically || ''}
+
+Financially,
+TSA (All): USD ${total.toLocaleString()}
+${hnwFinancially || ''}`;
+                setHnwSummaryText(summary);
+            };
+
 
             const filteredCountries = useMemo(() => {
                 if (!phOtherCountry) return [];
@@ -4036,6 +4084,7 @@ const [addressProofType, setAddressProofType] = useState('');
             }, [wrapperRef]);
 
             const productGroups = useMemo(() => {
+                // Include new HNW category for high-net-worth products
                 const groups = { 'GIO': [], 'Life': [], 'CI': [], 'Annuity': [], 'HNW': [] };
                 PRODUCT_DB.forEach(p => { if(groups[p.type]) groups[p.type].push(p); });
                 return groups;
@@ -4665,13 +4714,6 @@ const [addressProofType, setAddressProofType] = useState('');
                                                 </div>
                                             )}
                                         </div>
-                                        {prodType === 'HNW' && (
-                                            <div className="p-3 rounded border border-yellow-200 bg-yellow-50 text-xs">
-                                                <div>Selected high net worth plan requires additional information.</div>
-                                                <div className="mt-1">Please click the button below to enter LionMaster details.</div>
-                                                <button type="button" onClick={() => setIsHnwModalOpen(true)} className="mt-2 px-3 py-1 bg-blue-600 text-white rounded">Open LionMaster Input</button>
-                                            </div>
-                                        )}
                                         {phResidency === 'CN' && (
                                             <div className="bg-orange-50 p-2 rounded border border-orange-200">
                                                 <label className="text-[10px] text-orange-700 font-bold">IFS-MP submission date</label>
@@ -4729,16 +4771,16 @@ const [addressProofType, setAddressProofType] = useState('');
                                                 ))}
                                             </select>
                                         </div>
-                                        <div className="grid grid-cols-2 gap-3" style={{ display: prodType === 'HNW' ? 'none' : '' }}>
+                                        <div className="grid grid-cols-2 gap-3">
                                             <div><label className="text-xs font-bold text-slate-500">印刷日期</label><input type="date" value={proposalDate} onChange={(e) =>setProposalDate(e.target.value)} className="w-full border rounded p-1.5 text-sm"/></div>
                                             <div><label className="text-xs font-bold text-slate-500">年期</label><input type="number" value={yearTerm} onChange={(e) =>setYearTerm(e.target.value)} className="w-full border rounded p-1.5 text-sm"/></div>
                                         </div>
-                                        {prodType && prodType !== 'HNW' && <div className="bg-blue-50 px-3 py-2 rounded text-xs font-bold text-blue-700 flex justify-between"><span>產品類型: {prodType}</span>{selectedProductData?.multiplier && <span>(規則: 保額 x {selectedProductData.multiplier})</span>}</div>}
-                                        <div className="grid grid-cols-2 gap-3" style={{ display: prodType === 'HNW' ? 'none' : '' }}>
+                                        {prodType && <div className="bg-blue-50 px-3 py-2 rounded text-xs font-bold text-blue-700 flex justify-between"><span>產品類型: {prodType}</span>{selectedProductData?.multiplier && <span>(規則: 保額 x {selectedProductData.multiplier})</span>}</div>}
+                                        <div className="grid grid-cols-2 gap-3">
                                             <div><label className="text-xs font-bold text-slate-500">保額</label><input type="number" value={sumAssured} onChange={(e) =>setSumAssured(e.target.value)} className="w-full border rounded p-1.5 text-sm"/></div>
                                             <div><label className="text-xs font-bold text-slate-500">貨幣</label><select value={curr} onChange={(e) =>setCurr(e.target.value)} className="w-full border rounded p-1.5 text-sm"><option value="USD">USD</option><option value="HKD">HKD</option></select></div>
                                         </div>
-                                        <div className="grid grid-cols-2 gap-3" style={{ display: prodType === 'HNW' ? 'none' : '' }}>
+                                        <div className="grid grid-cols-2 gap-3">
                                             <div>
                                                 <label className="text-xs font-bold text-slate-500">繳費模式</label>
                                                 <select value={payMode} onChange={(e) =>setPayMode(e.target.value)} className="w-full border rounded p-1.5 text-sm">
@@ -4754,12 +4796,12 @@ const [addressProofType, setAddressProofType] = useState('');
                                             <div><label className="text-xs font-bold text-slate-500">保費</label><input type="number" value={premAmount} onChange={(e) =>setPremAmount(e.target.value)} className="w-full border rounded p-1.5 text-sm"/></div>
                                         </div>
                                         {/* Premium Financing (PF) toggle and input fields */}
-                                        <div className="flex items-center mt-2" style={{ display: prodType === 'HNW' ? 'none' : 'flex' }}>
+                                        <div className="flex items-center mt-2">
                                             <input type="checkbox" checked={isPremiumFinancing} onChange={(e) => setIsPremiumFinancing(e.target.checked)} className="mr-2" />
                                             <label className="text-xs font-bold text-slate-500">保費融資 Premium Financing</label>
                                         </div>
                                         {isPremiumFinancing && (
-                                            <div className="grid grid-cols-2 gap-3 mt-2 p-2 rounded" style={{ display: prodType === 'HNW' ? 'none' : '' }}>
+                                            <div className="grid grid-cols-2 gap-3 mt-2 p-2 rounded">
                                                 <div>
                                                     <label className="text-xs font-bold text-slate-500">貸款額</label>
                                                     <input type="number" value={pfLoanAmount} onChange={(e) => setPfLoanAmount(e.target.value)} className="w-full border rounded p-1.5 text-sm bg-yellow-50" />
@@ -4833,6 +4875,123 @@ const [addressProofType, setAddressProofType] = useState('');
                                                 <ul className="list-disc pl-4 space-y-1">
                                                     {financialReq.reqs.map((req, i) => <li key={i} className="text-slate-700 font-bold">{req}</li>)}
                                                 </ul>
+                                            </div>
+                                        </div>
+                                    )}
+                                    {/* HNW LionMaster module appears after financial requirements */}
+                                    {planName === 'LionMaster' && (
+                                        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm mt-6">
+                                            <div className="text-sm font-bold text-slate-700 uppercase tracking-wide border-l-4 border-red-500 pl-2 mb-2">LionMaster HNW</div>
+                                            <div className="grid grid-cols-1 gap-3">
+                                                <div className="grid grid-cols-2 gap-3">
+                                                    <div>
+                                                        <label className="text-xs font-bold text-slate-500">App Sign Date</label>
+                                                        <input type="date" value={hnwAppSignDate} onChange={(e) => setHnwAppSignDate(e.target.value)} className="w-full border rounded p-1.5 text-sm" />
+                                                    </div>
+                                                    <div>
+                                                        <label className="text-xs font-bold text-slate-500">Date of Birth (DOB)</label>
+                                                        <input type="date" value={hnwDOB} onChange={(e) => setHnwDOB(e.target.value)} className="w-full border rounded p-1.5 text-sm" />
+                                                    </div>
+                                                </div>
+                                                <div className="grid grid-cols-3 gap-3">
+                                                    <div>
+                                                        <label className="text-xs font-bold text-slate-500">Age</label>
+                                                        <div className="w-full border rounded p-1.5 text-sm bg-gray-100">{hnwAge || '-'}</div>
+                                                    </div>
+                                                    <div>
+                                                        <label className="text-xs font-bold text-slate-500">Gender</label>
+                                                        <select value={hnwGender} onChange={(e) => setHnwGender(e.target.value)} className="w-full border rounded p-1.5 text-sm">
+                                                            <option value="M">M</option>
+                                                            <option value="F">F</option>
+                                                        </select>
+                                                    </div>
+                                                    <div>
+                                                        <label className="text-xs font-bold text-slate-500">Smoking Status</label>
+                                                        <select value={hnwSmoking} onChange={(e) => setHnwSmoking(e.target.value)} className="w-full border rounded p-1.5 text-sm">
+                                                            {HNW_SMOKING_OPTIONS.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div className="grid grid-cols-3 gap-3">
+                                                    <div>
+                                                        <label className="text-xs font-bold text-slate-500">Class</label>
+                                                        <select value={hnwClass} onChange={(e) => setHnwClass(e.target.value)} className="w-full border rounded p-1.5 text-sm">
+                                                            {HNW_CLASS_OPTIONS.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
+                                                        </select>
+                                                    </div>
+                                                    <div>
+                                                        <label className="text-xs font-bold text-slate-500">Nationality</label>
+                                                        <select value={hnwNationality} onChange={(e) => setHnwNationality(e.target.value)} className="w-full border rounded p-1.5 text-sm">
+                                                            <option value="">Select...</option>
+                                                            {COUNTRY_LIST.map((c) => <option key={c.name} value={c.name}>{c.name}</option>)}
+                                                        </select>
+                                                    </div>
+                                                    <div>
+                                                        <label className="text-xs font-bold text-slate-500">Residency</label>
+                                                        <select value={hnwResidency} onChange={(e) => setHnwResidency(e.target.value)} className="w-full border rounded p-1.5 text-sm">
+                                                            <option value="">Select...</option>
+                                                            {Object.keys(COUNTRY_GROUP_MAP).map((k) => <option key={k} value={k}>{k}</option>)}
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                {hnwResidency && COUNTRY_GROUP_MAP[hnwResidency] && (
+                                                    <div className="mt-1 p-2 border border-slate-200 rounded bg-slate-50 text-[10px] text-slate-600">
+                                                        <div><span className="font-bold">Group:</span> {COUNTRY_GROUP_MAP[hnwResidency].group}</div>
+                                                        <div><span className="font-bold">Issue Limit:</span> {formatMoney(COUNTRY_GROUP_MAP[hnwResidency].issueLimit, 'USD')}</div>
+                                                        <div><span className="font-bold">Eligible Cities:</span> {COUNTRY_GROUP_MAP[hnwResidency].eligibleCities}</div>
+                                                    </div>
+                                                )}
+                                                <div className="grid grid-cols-2 gap-3">
+                                                    <div>
+                                                        <label className="text-xs font-bold text-slate-500">Sum Assured (USD)</label>
+                                                        <input type="number" value={hnwSumAssured} onChange={(e) => setHnwSumAssured(e.target.value)} className="w-full border rounded p-1.5 text-sm" />
+                                                    </div>
+                                                    <div>
+                                                        <label className="text-xs font-bold text-slate-500">Terms (Years)</label>
+                                                        <input type="number" value={hnwTerms} onChange={(e) => setHnwTerms(e.target.value)} className="w-full border rounded p-1.5 text-sm" />
+                                                    </div>
+                                                </div>
+                                                {/* Annual premium, existing coverage and annual income fields */}
+                                                <div className="grid grid-cols-3 gap-3">
+                                                    <div>
+                                                        <label className="text-xs font-bold text-slate-500">Annual Premium (USD)</label>
+                                                        <input type="number" value={hnwAnnualPremium} onChange={(e) => setHnwAnnualPremium(e.target.value)} className="w-full border rounded p-1.5 text-sm" />
+                                                    </div>
+                                                    <div>
+                                                        <label className="text-xs font-bold text-slate-500">Existing Coverage SA (USD)</label>
+                                                        <input type="number" value={hnwExistingSA} onChange={(e) => setHnwExistingSA(e.target.value)} className="w-full border rounded p-1.5 text-sm" />
+                                                    </div>
+                                                    <div>
+                                                        <label className="text-xs font-bold text-slate-500">Annual Income (USD)</label>
+                                                        <input type="number" value={hnwAnnualIncome} onChange={(e) => setHnwAnnualIncome(e.target.value)} className="w-full border rounded p-1.5 text-sm" />
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <label className="text-xs font-bold text-slate-500">Occupation</label>
+                                                    <input type="text" value={hnwOccupation} onChange={(e) => setHnwOccupation(e.target.value)} className="w-full border rounded p-1.5 text-sm" />
+                                                </div>
+                                                <div>
+                                                    <label className="text-xs font-bold text-slate-500">Medically</label>
+                                                    <textarea value={hnwMedically} onChange={(e) => setHnwMedically(e.target.value)} className="w-full border rounded p-1.5 text-xs" rows="2"></textarea>
+                                                </div>
+                                                <div>
+                                                    <label className="text-xs font-bold text-slate-500">Financially</label>
+                                                    <textarea value={hnwFinancially} onChange={(e) => setHnwFinancially(e.target.value)} className="w-full border rounded p-1.5 text-xs" rows="2"></textarea>
+                                                </div>
+                                                {hnwWarnings && hnwWarnings.length > 0 && (
+                                                    <div className="mt-2 bg-red-50 border border-red-200 p-2 rounded text-[10px] text-red-700 space-y-1">
+                                                        {hnwWarnings.map((w, i) => <div key={i}>⚠️ {w}</div>)}
+                                                    </div>
+                                                )}
+                                                <div className="flex items-center gap-2 mt-2">
+                                                    <button type="button" onClick={handleRunHnwSummary} className="px-3 py-1 rounded text-xs font-bold text-white bg-blue-600 hover:bg-blue-700">Run Case Summary</button>
+                                                    {hnwSummaryText && (
+                                                        <button type="button" onClick={() => { navigator.clipboard.writeText(hnwSummaryText); }} className="px-3 py-1 rounded text-xs font-bold text-white bg-green-600 hover:bg-green-700">Copy</button>
+                                                    )}
+                                                </div>
+                                                {hnwSummaryText && (
+                                                    <textarea className="w-full mt-2 p-2 border rounded text-xs" rows="6" value={hnwSummaryText} readOnly></textarea>
+                                                )}
                                             </div>
                                         </div>
                                     )}
@@ -5171,10 +5330,6 @@ const [addressProofType, setAddressProofType] = useState('');
                 // Reason of purchase insurance in HK
                 if (policyData.phResidency && policyData.phResidency !== 'HK' && policyData.reasonPurchaseHK) {
                     lines.push(`Reason of purchase insurance in HK: ${policyData.reasonPurchaseHK}`);
-                    // [UPDATE v2.9.1] When application type is Trust, move the Declaration line immediately below the reason line
-                    if (policyData.appType === 'Trust') {
-                        lines.push(`Declaration for Trust: ${policyData.trustDeclaration || ''}`);
-                    }
                 }
                 lines.push('--------');
                 lines.push(`Insured Info: ${getInsuredInfo()}`);
@@ -5212,7 +5367,9 @@ if (isJobMonthlyPlan) {
                         lines.push(`   ${(ben.name || '')} - ${rel} - ${(ben.percent || '')}%`);
                     });
                 }
-                // Declaration for Trust is inserted immediately after the Reason of purchase insurance in HK line when appType is Trust
+                if (policyData.appType === 'Trust') {
+                    lines.push(`Declaration for Trust: ${policyData.trustDeclaration || ''}`);
+                }
 
                 lines.push('');
                 // TSA (Med) and (All)
@@ -5310,10 +5467,9 @@ const showMed = (isPHNotSame && !isLifeOrCI)
                         lines.push(`   Total Annual Premiums before retirement: ${formatMoney(annualTotalHKD, 'HKD')}${pdfSuffixStr}`);
                         lines.push(`   Income used for each year prior to retirement: ${formatMoney(incomeUsed)}`);
                         lines.push(`   Total premiums (need to be supported by net asset) after retirement: ${formatMoney(postRetTotalHKD)}`);
-                        // [UPDATE v2.9.1] When Premium Financing is selected, show asset requirement before net assets
-                        if (affordData && affordData.isPremiumFinancing) {
-                            const assetReq = Number(res.totalRequiredHKD || 0);
-                            lines.push(`   Asset Required (資產負擔總需求): ${formatMoney(assetReq, 'HKD')}`);
+                        // When Premium Financing is used, insert Asset Required above Net assets available for use
+                        if (affordData.isPremiumFinancing && res.totalRequiredHKD) {
+                            lines.push(`   Asset Required: ${formatMoney(res.totalRequiredHKD, 'HKD')}`);
                         }
                         lines.push(`   Net assets available for use: ${formatMoney(netAssets)}`);
                         lines.push('   Premium Affordability Checking - Pass');
@@ -5336,10 +5492,9 @@ const showMed = (isPHNotSame && !isLifeOrCI)
                         if (!res.isPass && hasOverhang) {
                             lines.push(`   Total premiums (need to be supported by net asset) after retirement: ${formatMoney(postRetTotalHKD)}`);
                         }
-                        // [UPDATE v2.9.1] When Premium Financing is selected, show asset requirement before net assets
-                        if (affordData && affordData.isPremiumFinancing) {
-                            const assetReq = Number(res.totalRequiredHKD || 0);
-                            lines.push(`   Asset Required (資產負擔總需求): ${formatMoney(assetReq, 'HKD')}`);
+                        // Insert Asset Required line above Net assets when Premium Financing is enabled
+                        if (affordData.isPremiumFinancing && res.totalRequiredHKD) {
+                            lines.push(`   Asset Required: ${formatMoney(res.totalRequiredHKD, 'HKD')}`);
                         }
                         lines.push(`   Net assets available for use: ${formatMoney(netAssets)}`);
                         if (res.diff < 0) {
@@ -5849,14 +6004,21 @@ const shouldShowMed = () => {
                             <div><span className="font-bold">IFS-MP sign date:</span> {policyData.applicationSignDate ? formatDateVerbose(policyData.applicationSignDate) : 'N/A'}</div>
                         )}
                         {policyData.addressProofType && <div><span className="font-bold">3. Address proof:</span> {policyData.addressProofType}</div>}
+                        {/* Show reason of purchase in HK, and insert Trust declaration immediately after when applicable */}
                         {policyData.phResidency && policyData.phResidency !== 'HK' && policyData.reasonPurchaseHK && (
-                            <div><span className="font-bold">Reason of purchase insurance in HK:</span> {policyData.reasonPurchaseHK}</div>
+                            <>
+                                <div><span className="font-bold">Reason of purchase insurance in HK:</span> {policyData.reasonPurchaseHK}</div>
+                                {policyData.appType === 'Trust' && (
+                                    <div className="pl-4"><span className="font-bold">Declaration for Trust:</span> {policyData.trustDeclaration || ''}</div>
+                                )}
+                            </>
                         )}
                         <div><span className="font-bold">4. Insured:</span> {getInsuredInfo()}</div>
 {!policyData.isSamePerson && (
     <div className="pl-4"><span className="font-bold">Policyholder:</span> {getPolicyholderInfo()}</div>
 )}
-{policyData.appType === 'Trust' && (
+{/* If Trust application and reasonPurchaseHK was not displayed above, show declaration here */}
+{policyData.appType === 'Trust' && !(policyData.phResidency && policyData.phResidency !== 'HK' && policyData.reasonPurchaseHK) && (
     <div className="pl-4"><span className="font-bold">Declaration for Trust:</span> {policyData.trustDeclaration || ''}</div>
 )}
 {(policyData.planName === 'LionTycoon Beyond 2' || policyData.planName === 'LionHarvest Prime') && (
@@ -5975,10 +6137,9 @@ const shouldShowMed = () => {
                                         lines.push(<div key="fnaSplit1" className="pl-4">Total Annual Premiums before retirement: {formatMoney(annualTotalHKD, 'HKD')}{pdfSuffix}</div>);
                                         lines.push(<div key="fnaSplit2" className="pl-4">Income used for each year prior to retirement: {formatMoney(incomeUsed)}</div>);
                                         lines.push(<div key="fnaSplit3" className="pl-4">Total premiums (need to be supported by net asset) after retirement: {formatMoney(postRetTotalHKD)}</div>);
-                                        // [UPDATE v2.9.1] Show Asset Required before Net assets when PF is selected
-                                        if (affordData && affordData.isPremiumFinancing) {
-                                            const assetReq = res?.totalRequiredHKD || 0;
-                                            lines.push(<div key="fnaSplit3b" className="pl-4">Asset Required (資產負擔總需求): {formatMoney(assetReq, 'HKD')}</div>);
+                                        // Insert Asset Required row when Premium Financing is active
+                                        if (affordData.isPremiumFinancing && res.totalRequiredHKD) {
+                                            lines.push(<div key="fnaSplitAsset" className="pl-4">Asset Required: {formatMoney(res.totalRequiredHKD, 'HKD')}</div>);
                                         }
                                         lines.push(<div key="fnaSplit4" className="pl-4">Net assets available for use: {formatMoney(netAssets)}</div>);
                                     } else {
@@ -5998,10 +6159,9 @@ const shouldShowMed = () => {
                                         if (!res.isPass && hasOverhang) {
                                             lines.push(<div key="fna2b" className="pl-4">Total premiums (need to be supported by net asset) after retirement: {formatMoney(postRetTotalHKD)}</div>);
                                         }
-                                        // [UPDATE v2.9.1] Show Asset Required before Net assets when PF is selected
-                                        if (affordData && affordData.isPremiumFinancing) {
-                                            const assetReq = res?.totalRequiredHKD || 0;
-                                            lines.push(<div key="fna3b" className="pl-4">Asset Required (資產負擔總需求): {formatMoney(assetReq, 'HKD')}</div>);
+                                        // Insert Asset Required row above Net assets when Premium Financing is enabled
+                                        if (affordData.isPremiumFinancing && res.totalRequiredHKD) {
+                                            lines.push(<div key="fnaAsset" className="pl-4">Asset Required: {formatMoney(res.totalRequiredHKD, 'HKD')}</div>);
                                         }
                                         lines.push(<div key="fna3" className="pl-4">Net assets available for use: {formatMoney(netAssets)}</div>);
                                         if (diff < 0) lines.push(<div key="fna4" className="pl-4">Shortfall: {formatMoney(Math.abs(diff))}</div>);
@@ -6220,6 +6380,106 @@ const shouldShowMed = () => {
         };
 
         // ==========================================
+        // Tab: Master Broker List
+        // ==========================================
+        /**
+         * The BrokerListTab renders the master broker hierarchy with a search bar. Users may
+         * search by broker name, RM name or support staff name. The result will show all
+         * matching brokers and their associated RMs and support staff. Empty matches display
+         * a friendly message. The data source is defined in MASTER_BROKER_DATA.
+         */
+        const BrokerListTab = () => {
+            const [query, setQuery] = useState('');
+            const data = MASTER_BROKER_DATA;
+            // Flatten the master data into a list of {broker, rm, support} entries
+            const combos = useMemo(() => {
+                const list = [];
+                Object.entries(data).forEach(([broker, rms]) => {
+                    Object.entries(rms).forEach(([rm, supports]) => {
+                        // If no support defined, still push an empty entry
+                        if (!Array.isArray(supports) || supports.length === 0) {
+                            list.push({ broker, rm, support: '' });
+                        } else {
+                            supports.forEach((sup) => {
+                                list.push({ broker, rm, support: sup || '' });
+                            });
+                        }
+                    });
+                });
+                return list;
+            }, [data]);
+            // Filter the flattened list based on query
+            const filtered = useMemo(() => {
+                const q = query.toLowerCase().trim();
+                if (!q) return combos;
+                return combos.filter(({ broker, rm, support }) => {
+                    return (
+                        broker.toLowerCase().includes(q) ||
+                        rm.toLowerCase().includes(q) ||
+                        (support && support.toLowerCase().includes(q))
+                    );
+                });
+            }, [query, combos]);
+            return (
+                <div className="h-full flex flex-col bg-slate-50 overflow-y-auto custom-scrollbar tab-content">
+                    <div className="sticky top-0 z-50 bg-slate-50 px-6 pt-6 pb-4 border-b border-slate-200 shadow-sm">
+                        <h2 className="text-lg font-bold text-slate-700 mb-3 flex items-center gap-2">Master Broker List</h2>
+                        <div className="flex items-center gap-2 flex-wrap">
+                            <input
+                                type="text"
+                                placeholder="Keyword search: Broker / RM / Support"
+                                value={query}
+                                onChange={(e) => setQuery(e.target.value)}
+                                className="flex-1 border rounded p-2 text-sm"
+                            />
+                            <span className="text-xs text-slate-500 whitespace-nowrap">{filtered.length} results</span>
+                        </div>
+                    </div>
+                    <div className="p-6 pt-4">
+                        {filtered.length === 0 ? (
+                            <div className="text-sm text-slate-500">No matching brokers found.</div>
+                        ) : (
+                            <div className="overflow-x-auto">
+                                <table className="min-w-full text-sm">
+                                    <thead className="text-xs font-bold text-slate-600 uppercase tracking-wide">
+                                        <tr>
+                                            <th className="py-2 pr-2 text-left">Broker Name</th>
+                                            <th className="py-2 pr-2 text-left">RM</th>
+                                            <th className="py-2 text-left">Support</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-200">
+                                        {filtered.map(({ broker, rm, support }, idx) => (
+                                            <tr key={idx} className="hover:bg-slate-50">
+                                                <td className="py-1 pr-2 whitespace-nowrap">{broker}</td>
+                                                <td className="py-1 pr-2 whitespace-nowrap">
+                                                    <span className="inline-block px-2 py-0.5 rounded-full text-xs bg-slate-100 text-slate-700 border border-slate-200">
+                                                        {rm}
+                                                    </span>
+                                                </td>
+                                                <td className="py-1 whitespace-nowrap">
+                                                    {support ? (
+                                                        <span className="inline-block px-2 py-0.5 rounded-full text-xs bg-blue-100 text-blue-700 border border-blue-200">
+                                                            {support}
+                                                        </span>
+                                                    ) : (
+                                                        <span className="inline-block px-2 py-0.5 rounded-full text-xs bg-slate-100 text-slate-500 border border-slate-200">
+                                                            —
+                                                        </span>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        // ==========================================
         // Tab 6: Pending Message Sample
         // ==========================================
         const PendingMessageTab = () => {
@@ -6300,25 +6560,37 @@ const shouldShowMed = () => {
 
         
         /* ========= Versioning & Update Log ========= */
-        const CURRENT_VERSION = "v2.9";
+        // Updated version constant to reflect latest enhancements
+        const CURRENT_VERSION = "v2.8.3";
         const UPDATE_LOG_PASSWORD = "admin123";
         const versionHistory = [
 
 {
-    version: "v2.9",
-    date: "13 Jan 2026",
-    type: "Major Update",
+    version: "v2.8.3",
+    date: "14 Jan 2026",
+    type: "Minor Update",
     changes: [
-        "Updated copy logic for Prepay: Prepay payment mode is now treated as regular pay rather than single pay when copying policy information to the Affordability module.",
-        "Adjusted FNA output ordering when Premium Financing is used – the line 'Asset Required (資產負擔總需求)' now appears above 'Net assets available for use' in the case summary.",
-        "Repositioned 'Declaration for Trust' line to appear immediately below the 'Reason of purchase insurance in HK' line when Application Type is Trust.",
-        "Added a new page 'Master Broker List' with searchable broker, RM and support listings.",
-        "Introduced High Net Worth (HNW) module with new plan 'LionMaster'. Selecting this plan opens a dedicated modal for HNW input, auto‑calculates age, displays residency group/limits, runs simple medical/financial checks and generates a case summary for copy.",
-        "Added HNW plan category to product list and plan selector.",
-        "Bumped application version to v2.9."
+        "Adjusted the Master Broker List display to a tabular layout with broker, RM and support columns. Added keyword search placeholder and results count.",
+        "Expanded the High Net Worth residency dropdown to include the full country group list with issue limits and eligible cities based on the provided Country Group manual.",
+        "Implemented High Net Worth medical requirements according to the Routine Medical Requirements table and updated financial requirements thresholds to match the Financial guidelines.",
+        "Added an 'Annual Income (USD)' input to the HNW module and computed an income requirement using the formula (75 − age capped at 35) × annual income; displayed the resulting maximum sum assured in warnings.",
+        "Bumped application version to v2.8.3."
     ]
 },
 
+{
+    version: "v2.8.2",
+    date: "13 Jan 2026",
+    type: "Minor Update",
+    changes: [
+        "Updated payment mode logic so that Prepay is treated as Regular Pay rather than Single Pay during affordability calculations.",
+        "Revised the Case Summary FNA layout to show ‘Asset Required’ above ‘Net assets available for use’ when Premium Financing is selected.",
+        "Adjusted the positioning of the Trust declaration so that it appears immediately after the ‘Reason of purchase insurance in HK’ when the application type is Trust.",
+        "Added a new 'Master Broker List' tab with searchable broker–RM–support hierarchy based on the supplied master list.",
+        "Introduced a new plan category ‘HNW’ with the ‘LionMaster’ plan. Selecting this plan reveals a dedicated High Net Worth (HNW) input form, age calculation, residency group lookup, simplified financial/medical requirement checks and generates a formatted case summary for HNW applications.",
+        "Bumped application version to v2.8.2."
+    ]
+},
 {
     version: "v2.8.1",
     date: "12 Jan 2026",
@@ -6923,153 +7195,7 @@ const App = () => {
 
                     
 
-                    {
-                    {/* HNW LionMaster Input Modal */}
-                    {isHnwModalOpen && (
-                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-                            <div className="w-full max-w-3xl bg-white rounded-xl shadow-xl border border-slate-200 overflow-hidden">
-                                <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200">
-                                    <div className="font-semibold text-slate-800">LionMaster (HNW) - Additional Input</div>
-                                    <button
-                                        type="button"
-                                        onClick={() => setIsHnwModalOpen(false)}
-                                        className="text-xs bg-slate-100 border border-slate-200 px-3 py-2 rounded hover:bg-slate-200 transition-colors"
-                                    >
-                                        Close
-                                    </button>
-                                </div>
-
-                                <div className="p-4 max-h-[75vh] overflow-y-auto space-y-4">
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                        <div>
-                                            <label className="text-[10px] text-slate-500 font-bold">Signing date</label>
-                                            <input type="date" value={hnwSignDate} onChange={(e) => setHnwSignDate(e.target.value)} className="w-full border rounded p-1.5 text-sm"/>
-                                        </div>
-                                        <div>
-                                            <label className="text-[10px] text-slate-500 font-bold">DOB</label>
-                                            <input type="date" value={hnwDOB} onChange={(e) => setHnwDOB(e.target.value)} className="w-full border rounded p-1.5 text-sm"/>
-                                        </div>
-                                        <div>
-                                            <label className="text-[10px] text-slate-500 font-bold">Age (auto)</label>
-                                            <input type="text" value={hnwAge} readOnly className="w-full border rounded p-1.5 text-sm bg-slate-50"/>
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                        <div>
-                                            <label className="text-[10px] text-slate-500 font-bold">Gender</label>
-                                            <select value={hnwGender} onChange={(e) => setHnwGender(e.target.value)} className="w-full border rounded p-1.5 text-sm">
-                                                <option value="M">M</option>
-                                                <option value="F">F</option>
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label className="text-[10px] text-slate-500 font-bold">Smoking</label>
-                                            <select value={hnwSmoking} onChange={(e) => setHnwSmoking(e.target.value)} className="w-full border rounded p-1.5 text-sm">
-                                                <option value="">Please select</option>
-                                                {HNW_SMOKING_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label className="text-[10px] text-slate-500 font-bold">Class</label>
-                                            <select value={hnwClass} onChange={(e) => setHnwClass(e.target.value)} className="w-full border rounded p-1.5 text-sm">
-                                                <option value="">Please select</option>
-                                                {HNW_CLASS_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                        <div>
-                                            <label className="text-[10px] text-slate-500 font-bold">Nationality</label>
-                                            <input type="text" value={hnwNationality} onChange={(e) => setHnwNationality(e.target.value)} className="w-full border rounded p-1.5 text-sm" placeholder="e.g. HKG"/>
-                                        </div>
-                                        <div>
-                                            <label className="text-[10px] text-slate-500 font-bold">Residency</label>
-                                            <select value={hnwResidency} onChange={(e) => handleHnwResidencyChange(e.target.value)} className="w-full border rounded p-1.5 text-sm">
-                                                <option value="">Please select</option>
-                                                {COUNTRY_GROUP_DATA.map(c => <option key={c.country} value={c.country}>{c.country}</option>)}
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label className="text-[10px] text-slate-500 font-bold">Policy term</label>
-                                            <input type="text" value={hnwTerm} onChange={(e) => setHnwTerm(e.target.value)} className="w-full border rounded p-1.5 text-sm" placeholder="e.g. 10/15/20"/>
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                        <div>
-                                            <label className="text-[10px] text-slate-500 font-bold">Sum assured (USD)</label>
-                                            <input type="number" value={hnwSumAssured} onChange={(e) => setHnwSumAssured(e.target.value)} className="w-full border rounded p-1.5 text-sm"/>
-                                        </div>
-                                        <div>
-                                            <label className="text-[10px] text-slate-500 font-bold">Annual premium</label>
-                                            <input type="text" value={hnwAnnualPremium} onChange={(e) => setHnwAnnualPremium(e.target.value)} className="w-full border rounded p-1.5 text-sm"/>
-                                        </div>
-                                        <div>
-                                            <label className="text-[10px] text-slate-500 font-bold">Existing coverage (USD)</label>
-                                            <input type="number" value={hnwExistingCoverage} onChange={(e) => setHnwExistingCoverage(e.target.value)} className="w-full border rounded p-1.5 text-sm"/>
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                        <div>
-                                            <label className="text-[10px] text-slate-500 font-bold">Occupation</label>
-                                            <input type="text" value={hnwOccupation} onChange={(e) => setHnwOccupation(e.target.value)} className="w-full border rounded p-1.5 text-sm"/>
-                                        </div>
-                                        <div>
-                                            <label className="text-[10px] text-slate-500 font-bold">Medically</label>
-                                            <input type="text" value={hnwMedically} onChange={(e) => setHnwMedically(e.target.value)} className="w-full border rounded p-1.5 text-sm" placeholder="e.g. Provided / Not provided"/>
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <label className="text-[10px] text-slate-500 font-bold">Financially</label>
-                                        <input type="text" value={hnwFinancially} onChange={(e) => setHnwFinancially(e.target.value)} className="w-full border rounded p-1.5 text-sm" placeholder="e.g. Provided / Not provided"/>
-                                    </div>
-
-                                    {hnwWarnings && hnwWarnings.length > 0 && (
-                                        <div className="bg-orange-50 border border-orange-200 rounded p-3 text-xs text-orange-800 space-y-1">
-                                            {hnwWarnings.map((w, i) => <div key={i}>• {w}</div>)}
-                                        </div>
-                                    )}
-
-                                    <div className="flex flex-wrap items-center gap-2">
-                                        <button
-                                            type="button"
-                                            onClick={handleRunHnwSummary}
-                                            className="px-3 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-                                        >
-                                            Generate Summary
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                try { navigator.clipboard.writeText(hnwSummary || ""); } catch(e) {}
-                                            }}
-                                            className="px-3 py-2 text-sm bg-white border border-slate-300 text-slate-800 rounded hover:bg-slate-50 transition-colors"
-                                        >
-                                            Copy Summary
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => { setHnwSummary(""); }}
-                                            className="px-3 py-2 text-sm bg-slate-100 border border-slate-200 text-slate-700 rounded hover:bg-slate-200 transition-colors"
-                                        >
-                                            Clear
-                                        </button>
-                                    </div>
-
-                                    <div>
-                                        <label className="text-[10px] text-slate-500 font-bold">Summary output</label>
-                                        <textarea value={hnwSummary} readOnly className="w-full border rounded p-2 text-sm min-h-[160px] bg-slate-50"></textarea>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-/* Export Options Modal (Hybrid Mode) */}
+                    {/* Export Options Modal (Hybrid Mode) */}
                     {isExportOptionsOpen && (
                         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
                             <div className="w-full max-w-lg bg-white rounded-xl shadow-xl border border-slate-200 overflow-hidden">
@@ -7297,6 +7423,8 @@ const App = () => {
                             <button onClick={() => setActiveTab('exclusion')} className={`pb-3 px-2 flex items-center gap-2 transition-all border-b-2 ${activeTab === 'exclusion' ? 'border-blue-600 text-blue-600 font-bold' : 'border-transparent text-slate-500 hover:text-slate-700'}`}><Info size={18}/> Exclusion Code</button>
                             {/* Occupation tab moved to last */}
                             <button onClick={() => setActiveTab('occupation')} className={`pb-3 px-2 flex items-center gap-2 transition-all border-b-2 ${activeTab === 'occupation' ? 'border-blue-600 text-blue-600 font-bold' : 'border-transparent text-slate-500 hover:text-slate-700'}`}><Briefcase size={18}/> Occupation Rating</button>
+                            {/* New Master Broker List tab */}
+                            <button onClick={() => setActiveTab('broker')} className={`pb-3 px-2 flex items-center gap-2 transition-all border-b-2 ${activeTab === 'broker' ? 'border-blue-600 text-blue-600 font-bold' : 'border-transparent text-slate-500 hover:text-slate-700'}`}>Master Broker List</button>
                         </div>
                     </div>
                     <div className="flex-1 overflow-hidden relative">
@@ -7308,6 +7436,7 @@ const App = () => {
                         <div style={{ display: activeTab === 'pending' ? 'block' : 'none', height: '100%' }}><PendingMessageTab /></div>
                         <div style={{ display: activeTab === 'exclusion' ? 'block' : 'none', height: '100%' }}><ExclusionCodeTab /></div>
                         <div style={{ display: activeTab === 'occupation' ? 'block' : 'none', height: '100%' }}><OccupationTab /></div>
+                        <div style={{ display: activeTab === 'broker' ? 'block' : 'none', height: '100%' }}><BrokerListTab /></div>
                     </div>
                     {toast.show && (
                         <div className="fixed bottom-4 right-4 bg-green-600 text-white px-3 py-2 rounded shadow-lg text-xs z-50">
