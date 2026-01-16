@@ -10,7 +10,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Updated version title -->
-    <title>UW assessment tool (v2.8.3)</title>
+    <title>UW assessment tool (v2.8.4)</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -2087,6 +2087,7 @@ const HK_HOLIDAYS_2025_2026 = [
             { prefix: '(Pending)', text: 'Settlor’s employer details (business card or web screenshot showing business address) for AML checking.' },
             { prefix: '(Pending)', text: 'Supplementary Form to confirm information on Premium Deposit Fund illustration (pages 1-2) is verified by the settlor' },
             { prefix: '(Pending)', text: 'Financial Questionnaire, agent / broker report, and supporting financial evidence (liquid asset proof and source of funds/wealth) for total premium over USD 1M. See underwriting manual 10.3 for details' },
+            { prefix: '(Pending)', text: 'Financial supporting document with certified true copy to prove that the policyholder has a portfolio of not less than HKD 8 million (Re: Submitted Request for Departure from Commission Spreading Requirement form)' },
             { prefix: '(Pending)', text: 'Employment details (business card or web screenshot showing business address) for AML checking' },
             { prefix: '(Pending)', text: 'Special Health Questionnaire (for urinary tract infection in July 2025)' },
             { prefix: '(Pending)', text: 'Source(s) of Funds/Wealth Supplementary Information Questionnaire for Financial Supporter as part of income is a family gift' },
@@ -4051,19 +4052,32 @@ const [addressProofType, setAddressProofType] = useState('');
                 const existing = Number(hnwExistingSA || 0);
                 const group = (hnwResidency && COUNTRY_GROUP_MAP[hnwResidency]) ? COUNTRY_GROUP_MAP[hnwResidency].group : '';
                 const total = sa + existing;
+                const annualIncome = Number(hnwAnnualIncome || 0);
+                const ageNum = (hnwAge === '' || hnwAge === null || hnwAge === undefined) ? NaN : Number(hnwAge);
+                const multiple = (Number.isFinite(ageNum)) ? Math.max(0, Math.min(75 - ageNum, 35)) : 0;
+                const maxSaByIncome = annualIncome * multiple;
+                const smokingVal = String(hnwSmoking || '').trim();
+                const smokerShort = smokingVal
+                    ? (smokingVal.toUpperCase().includes('NS') ? 'NS' : (smokingVal.toUpperCase().includes('S') ? 'S' : smokingVal))
+                    : '';
+                const premiumNum = Number(hnwAnnualPremium || 0);
                 const summary =
-`Applying LionMaster USD ${sa.toLocaleString()} - ${hnwClass} - ${hnwTerms} (${hnwAnnualPremium})
+`Applying LionMaster USD ${sa.toLocaleString()} ${hnwClass} - ${hnwTerms} years
+Annual premium: USD ${Number.isFinite(premiumNum) && premiumNum > 0 ? premiumNum.toLocaleString() : (hnwAnnualPremium || '')}
 
-${hnwGender}/${hnwAge}/${hnwSmoking}
-${hnwOccupation || ''}
-${hnwNationality || ''}
-${hnwResidency || ''}
+${hnwGender}/${hnwAge}/${smokerShort || hnwSmoking}
+Occupation: ${hnwOccupation || ''}
+Nationality: ${hnwNationality || ''}
+${hnwResidency || ''} Resident
 Country Rate - Group ${group}
 
 Medically,
 ${hnwMedically || ''}
 
 Financially,
+Annual income USD ${Number.isFinite(annualIncome) && annualIncome > 0 ? annualIncome.toLocaleString() : (hnwAnnualIncome || '')}
+=> Max. SA up to [(${Number.isFinite(ageNum) ? (75 - ageNum) : '75 - Age'}, max cap 35) x annual income] = USD ${maxSaByIncome.toLocaleString()}
+
 TSA (All): USD ${total.toLocaleString()}
 ${hnwFinancially || ''}`;
                 setHnwSummaryText(summary);
@@ -6391,35 +6405,43 @@ const shouldShowMed = () => {
         const BrokerListTab = () => {
             const [query, setQuery] = useState('');
             const data = MASTER_BROKER_DATA;
-            // Flatten the master data into a list of {broker, rm, support} entries
-            const combos = useMemo(() => {
-                const list = [];
+            // Group broker data into one row per broker with multi-pill RM / Support display
+            const brokerRows = useMemo(() => {
+                const rows = [];
                 Object.entries(data).forEach(([broker, rms]) => {
-                    Object.entries(rms).forEach(([rm, supports]) => {
-                        // If no support defined, still push an empty entry
-                        if (!Array.isArray(supports) || supports.length === 0) {
-                            list.push({ broker, rm, support: '' });
-                        } else {
-                            supports.forEach((sup) => {
-                                list.push({ broker, rm, support: sup || '' });
+                    const rmSet = new Set();
+                    const supSet = new Set();
+                    Object.entries(rms || {}).forEach(([rm, supports]) => {
+                        if (rm) rmSet.add(rm);
+                        if (Array.isArray(supports)) {
+                            supports.forEach((s) => {
+                                const v = (s ?? '').toString().trim();
+                                if (v) supSet.add(v);
                             });
                         }
                     });
+                    rows.push({
+                        broker,
+                        rms: Array.from(rmSet),
+                        supports: Array.from(supSet)
+                    });
                 });
-                return list;
+                // stable sort by broker name
+                rows.sort((a, b) => a.broker.localeCompare(b.broker));
+                return rows;
             }, [data]);
-            // Filter the flattened list based on query
+
+            // Filter the grouped rows based on query
             const filtered = useMemo(() => {
                 const q = query.toLowerCase().trim();
-                if (!q) return combos;
-                return combos.filter(({ broker, rm, support }) => {
-                    return (
-                        broker.toLowerCase().includes(q) ||
-                        rm.toLowerCase().includes(q) ||
-                        (support && support.toLowerCase().includes(q))
-                    );
+                if (!q) return brokerRows;
+                return brokerRows.filter(({ broker, rms, supports }) => {
+                    const brokerHit = broker.toLowerCase().includes(q);
+                    const rmHit = (rms || []).some(r => r.toLowerCase().includes(q));
+                    const supHit = (supports || []).some(s => s.toLowerCase().includes(q));
+                    return brokerHit || rmHit || supHit;
                 });
-            }, [query, combos]);
+            }, [query, brokerRows]);
             return (
                 <div className="h-full flex flex-col bg-slate-50 overflow-y-auto custom-scrollbar tab-content">
                     <div className="sticky top-0 z-50 bg-slate-50 px-6 pt-6 pb-4 border-b border-slate-200 shadow-sm">
@@ -6449,24 +6471,34 @@ const shouldShowMed = () => {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-200">
-                                        {filtered.map(({ broker, rm, support }, idx) => (
+                                        {filtered.map(({ broker, rms, supports }, idx) => (
                                             <tr key={idx} className="hover:bg-slate-50">
                                                 <td className="py-1 pr-2 whitespace-nowrap">{broker}</td>
-                                                <td className="py-1 pr-2 whitespace-nowrap">
-                                                    <span className="inline-block px-2 py-0.5 rounded-full text-xs bg-slate-100 text-slate-700 border border-slate-200">
-                                                        {rm}
-                                                    </span>
+                                                <td className="py-1 pr-2">
+                                                    <div className="flex flex-wrap gap-1">
+                                                        {(rms || []).length > 0 ? (
+                                                            (rms || []).map((rm) => (
+                                                                <span key={rm} className="inline-block px-2 py-0.5 rounded-full text-xs bg-slate-100 text-slate-700 border border-slate-200 whitespace-nowrap">
+                                                                    {rm}
+                                                                </span>
+                                                            ))
+                                                        ) : (
+                                                            <span className="inline-block px-2 py-0.5 rounded-full text-xs bg-slate-100 text-slate-500 border border-slate-200">—</span>
+                                                        )}
+                                                    </div>
                                                 </td>
-                                                <td className="py-1 whitespace-nowrap">
-                                                    {support ? (
-                                                        <span className="inline-block px-2 py-0.5 rounded-full text-xs bg-blue-100 text-blue-700 border border-blue-200">
-                                                            {support}
-                                                        </span>
-                                                    ) : (
-                                                        <span className="inline-block px-2 py-0.5 rounded-full text-xs bg-slate-100 text-slate-500 border border-slate-200">
-                                                            —
-                                                        </span>
-                                                    )}
+                                                <td className="py-1">
+                                                    <div className="flex flex-wrap gap-1">
+                                                        {(supports || []).length > 0 ? (
+                                                            (supports || []).map((support) => (
+                                                                <span key={support} className="inline-block px-2 py-0.5 rounded-full text-xs bg-blue-100 text-blue-700 border border-blue-200 whitespace-nowrap">
+                                                                    {support}
+                                                                </span>
+                                                            ))
+                                                        ) : (
+                                                            <span className="inline-block px-2 py-0.5 rounded-full text-xs bg-slate-100 text-slate-500 border border-slate-200">—</span>
+                                                        )}
+                                                    </div>
                                                 </td>
                                             </tr>
                                         ))}
@@ -6561,9 +6593,21 @@ const shouldShowMed = () => {
         
         /* ========= Versioning & Update Log ========= */
         // Updated version constant to reflect latest enhancements
-        const CURRENT_VERSION = "v2.8.3";
+        const CURRENT_VERSION = "v2.8.4";
         const UPDATE_LOG_PASSWORD = "admin123";
         const versionHistory = [
+
+{
+    version: "v2.8.4",
+    date: "16 Jan 2026",
+    type: "Patch Update",
+    changes: [
+        "Master Broker List: Grouped multiple RM / Support entries into a single broker row (multi-pill display).",
+        "HNW case summary comment format updated to the new required layout including annual premium, resident line, annual income and max SA formula, and TSA(All) section.",
+        "Pending Message Sample: Added new pending item for financial supporting document (certified true copy) to prove portfolio >= HKD 8 million (Departure from Commission Spreading Requirement).",
+        "Bumped application version to v2.8.4."
+    ]
+},
 
 {
     version: "v2.8.3",
