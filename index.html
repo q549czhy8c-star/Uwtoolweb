@@ -10,7 +10,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Updated version title -->
-    <title>UW assessment tool (v2.8.4)</title>
+    <title>UW assessment tool (v2.8.5)</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -97,6 +97,137 @@
 
         const SOF_OPTIONS = ["Salary", "Income", "Saving", "Investments", "Company sale /profits", "Premium Financing", "Others"];
         const SOW_OPTIONS = ["Income-savings from salary(basic and/or bonus)", "Company sale/profits", "Sale of shares or other investments", "Sale of property", "Others"];
+
+        // ==========================================================
+        // Commission Spreading (Professional Investor - PI) Mapping
+        // Hardcoded from PI.txt (standalone HTML requirement)
+        // ==========================================================
+        const COMMISSION_SPREADING_PREFIX = "(pending) Financial supporting document with certified true copy to prove that the policyholder has a portfolio of not less than HKD 8 million (Re: Submitted Request for Departure from Commission Spreading Requirement form)";
+
+        const PI_INVESTOR_TYPES = [
+            "INDIVIDUAL PROFESSIONAL INVESTOR",
+            "CORPORATE PROFESSIONAL INVESTOR"
+        ];
+
+        // Each scenario/category provides a dropdown label and the requirement text to append in Case Summary -> Issue UN.
+        const PI_REQUIREMENTS = {
+            "INDIVIDUAL PROFESSIONAL INVESTOR": [
+                {
+                    key: "IND_A",
+                    label: "(a) a portfolio on his/her own account(s)",
+                    requirementText: [
+                        "Individual Professional Investor (PI) – Scenario (a)",
+                        "Eligibility threshold: Proposed Policyholder / Settlor has a portfolio of not less than HKD 8,000,000 (or its equivalent in any foreign currency).",
+                        "Supporting document(s) – provide certified true copies by insurance advisor / lawyer / accountant (Provide ONE of A1–A3 within 12 months from application submission date):",
+                        "A1 Statement(s) of account(s) or certificate(s) issued by a custodian (e.g. bank, securities firm, etc.)",
+                        "A2 Certificate(s) issued by an auditor or a certified public accountant",
+                        "A3 Public filing(s) submitted by or on behalf of the individual"
+                    ].join("\n")
+                },
+                {
+                    key: "IND_B",
+                    label: "(b) a portfolio on a joint account with his/her associate",
+                    requirementText: [
+                        "Individual Professional Investor (PI) – Scenario (b)",
+                        "Eligibility threshold: Proposed Policyholder / Settlor has a portfolio of not less than HKD 8,000,000 (or its equivalent in any foreign currency).",
+                        "Supporting document(s) – provide certified true copies by insurance advisor / lawyer / accountant (Provide ONE of A1–A3 within 12 months from application submission date):",
+                        "A1 Statement(s) of account(s) or certificate(s) issued by a custodian (e.g. bank, securities firm, etc.)",
+                        "A2 Certificate(s) issued by an auditor or a certified public accountant",
+                        "A3 Public filing(s) submitted by or on behalf of the individual",
+                        "Additional documents to be required:",
+                        "B1 Relationship proof for associate in the joint account (e.g. marriage certificates, birth certificate)"
+                    ].join("\n")
+                },
+                {
+                    key: "IND_C",
+                    label: "(c) his/her share of a portfolio on a joint account (non-associate)",
+                    requirementText: [
+                        "Individual Professional Investor (PI) – Scenario (c)",
+                        "Eligibility threshold: Proposed Policyholder / Settlor has a portfolio of not less than HKD 8,000,000 (or its equivalent in any foreign currency).",
+                        "Supporting document(s) – provide certified true copies by insurance advisor / lawyer / accountant (Provide ONE of A1–A3 within 12 months from application submission date):",
+                        "A1 Statement(s) of account(s) or certificate(s) issued by a custodian (e.g. bank, securities firm, etc.)",
+                        "A2 Certificate(s) issued by an auditor or a certified public accountant",
+                        "A3 Public filing(s) submitted by or on behalf of the individual",
+                        "Additional documents to be required:",
+                        "B2a A written agreement among the account holders specifying the individual’s share of the portfolio; OR",
+                        "B2b Written confirmation that there is no agreement among account holders"
+                    ].join("\n")
+                },
+                {
+                    key: "IND_D",
+                    label: "(d) a portfolio of a wholly-owned investment-holding corporation",
+                    requirementText: [
+                        "Individual Professional Investor (PI) – Scenario (d)",
+                        "Eligibility threshold: Proposed Policyholder / Settlor has a portfolio of not less than HKD 8,000,000 (or its equivalent in any foreign currency).",
+                        "Supporting document(s) – provide certified true copies by insurance advisor / lawyer / accountant (Provide ONE of A1–A3 within 12 months from application submission date):",
+                        "A1 Statement(s) of account(s) or certificate(s) issued by a custodian (e.g. bank, securities firm, etc.)",
+                        "A2 Certificate(s) issued by an auditor or a certified public accountant",
+                        "A3 Public filing(s) submitted by or on behalf of the individual",
+                        "Additional documents to be required:",
+                        "B3a Proof to demonstrate the ownership of the corporation (e.g. company search result, company annual return, shareholders’ register, etc.) issued within 12 months from application submission date; AND",
+                        "B3b Documents to ascertain the principal business of the corporation is to hold investments (e.g. Business Registration Certificate)"
+                    ].join("\n")
+                }
+            ],
+            "CORPORATE PROFESSIONAL INVESTOR": [
+                {
+                    key: "CORP_A",
+                    label: "(a) corporation/partnership (portfolio ≥ HKD 8M OR total assets ≥ HKD 40M)",
+                    requirementText: [
+                        "Corporate Professional Investor (PI) – Category (a)",
+                        "Category (a): A corporation/partnership having portfolio ≥ HKD 8,000,000 (or equivalent) OR total assets ≥ HKD 40,000,000 (or equivalent).",
+                        "Supporting document(s) – provide certified true copies by insurance advisor / lawyer / accountant (Provide ONE of A1–A4):",
+                        "A1 Most recent audited financial statements prepared within 16 months from application submission date; OR",
+                        "A2 Statement(s) of account(s) or certificate(s) issued by a custodian within 12 months from application submission date; OR",
+                        "A3 Certificate(s) issued by an auditor or a certified public accountant within 12 months from application submission date; OR",
+                        "A4 Public filing(s) submitted by or on behalf of the corporation/partnership/trust corporation within 12 months from application submission date"
+                    ].join("\n")
+                },
+                {
+                    key: "CORP_B",
+                    label: "(b) trust corporation (total assets ≥ HKD 40M)",
+                    requirementText: [
+                        "Corporate Professional Investor (PI) – Category (b)",
+                        "Category (b): A trust corporation having been entrusted under the trust(s) of which it acts as trustee with total assets ≥ HKD 40,000,000 (or equivalent).",
+                        "Supporting document(s) – provide certified true copies by insurance advisor / lawyer / accountant (Provide ONE of A1–A4):",
+                        "A1 Most recent audited financial statements prepared within 16 months from application submission date; OR",
+                        "A2 Statement(s) of account(s) or certificate(s) issued by a custodian within 12 months from application submission date; OR",
+                        "A3 Certificate(s) issued by an auditor or a certified public accountant within 12 months from application submission date; OR",
+                        "A4 Public filing(s) submitted by or on behalf of the corporation/partnership/trust corporation within 12 months from application submission date"
+                    ].join("\n")
+                },
+                {
+                    key: "CORP_C",
+                    label: "(c) investment-holding corporation wholly owned by PI / specified PI",
+                    requirementText: [
+                        "Corporate Professional Investor (PI) – Category (c)",
+                        "Category (c): A corporation whose principal business is to hold investments and is wholly owned by one or more qualified persons (Corporate PI / Individual PI / Specified Professional Investor).",
+                        "Supporting document(s) – provide certified true copies by insurance advisor / lawyer / accountant (Provide ONE of A1–A4):",
+                        "A1 Most recent audited financial statements prepared within 16 months from application submission date; OR",
+                        "A2 Statement(s) of account(s) or certificate(s) issued by a custodian within 12 months from application submission date; OR",
+                        "A3 Certificate(s) issued by an auditor or a certified public accountant within 12 months from application submission date; OR",
+                        "A4 Public filing(s) submitted by or on behalf of the corporation/partnership/trust corporation within 12 months from application submission date",
+                        "Additional documents to be required:",
+                        "B1a Proof to demonstrate the ownership of the corporation (e.g. company search result, company annual return, shareholders’ register, etc.) issued within 12 months from application submission date; AND",
+                        "B1b Documents to ascertain the principal business of the corporation is to hold investments (e.g. Business Registration Certificate); AND",
+                        "B1c Documents to ascertain relevant information of the relevant individual(s) or corporation(s), as applicable (e.g. evidence that relevant party is Corporate PI / Individual PI / Specified Professional Investor)."
+                    ].join("\n")
+                },
+                {
+                    key: "CORP_D",
+                    label: "(d) corporation wholly owns a corporation referred to in 2(a)",
+                    requirementText: [
+                        "Corporate Professional Investor (PI) – Category (d)",
+                        "Category (d): A corporation which wholly owns a corporation referred to in category 2(a).",
+                        "Supporting document(s) – provide certified true copies by insurance advisor / lawyer / accountant (Provide ONE of A1–A4):",
+                        "A1 Most recent audited financial statements prepared within 16 months from application submission date; OR",
+                        "A2 Statement(s) of account(s) or certificate(s) issued by a custodian within 12 months from application submission date; OR",
+                        "A3 Certificate(s) issued by an auditor or a certified public accountant within 12 months from application submission date; OR",
+                        "A4 Public filing(s) submitted by or on behalf of the corporation/partnership/trust corporation within 12 months from application submission date"
+                    ].join("\n")
+                }
+            ]
+        };
 
                 // Country List updated based on country.txt
         const COUNTRY_LIST = [
@@ -3655,6 +3786,12 @@ const [addressProofType, setAddressProofType] = useState('');
             const [pdfAmount, setPdfAmount] = useState('');
             const [trustBeneficiaries, setTrustBeneficiaries] = useState([{ name: '', relationType: 'Self', relationDetail: '', percent: '' }]);
             const [unpaidPremium, setUnpaidPremium] = useState(false);
+
+            // Commission Spreading (Professional Investor - PI)
+            const [commissionSpreading, setCommissionSpreading] = useState(false);
+            const [piInvestorType, setPiInvestorType] = useState("");
+            const [piScenarioKey, setPiScenarioKey] = useState("");
+
             const [reasonPurchaseHK, setReasonPurchaseHK] = useState('');
             const [showBizNatureHint, setShowBizNatureHint] = useState(false);
             const [otherInsurances, setOtherInsurances] = useState([{ name: '', currency: curr, amount: '', status: 'Existing' }]);
@@ -3791,6 +3928,11 @@ const [addressProofType, setAddressProofType] = useState('');
                         if (s.paymentMethod !== undefined) setPaymentMethod(s.paymentMethod);
                         if (s.pdfAmount !== undefined) setPdfAmount(s.pdfAmount);
 
+                        // Commission Spreading (Professional Investor - PI)
+                        if (s.commissionSpreading !== undefined) setCommissionSpreading(!!s.commissionSpreading);
+                        if (s.piInvestorType !== undefined) setPiInvestorType(s.piInvestorType);
+                        if (s.piScenarioKey !== undefined) setPiScenarioKey(s.piScenarioKey);
+
                         // Others
                         if (Array.isArray(s.trustBeneficiaries)) setTrustBeneficiaries(s.trustBeneficiaries);
                         if (s.unpaidPremium !== undefined) setUnpaidPremium(!!s.unpaidPremium);
@@ -3873,6 +4015,11 @@ const [addressProofType, setAddressProofType] = useState('');
                         paymentMethod,
                         pdfAmount,
 
+                        // Commission Spreading (Professional Investor - PI)
+                        commissionSpreading,
+                        piInvestorType,
+                        piScenarioKey,
+
                         trustBeneficiaries,
                         unpaidPremium,
                         reasonPurchaseHK,
@@ -3915,6 +4062,7 @@ const [addressProofType, setAddressProofType] = useState('');
                 targetSavingHKD, targetYear, surrenderValueUSD, yearTerm,
                 fnaRetireAge, fnaDisposableIncome, fnaIncomePercent, fnaLiquidAssets, fnaAssetPercent, fnaSof, fnaSow, noFna,
                 paymentDate, paymentCurrency, paymentAmount, paymentPayor, paymentMethod, pdfAmount,
+                commissionSpreading, piInvestorType, piScenarioKey,
                 trustBeneficiaries, unpaidPremium, reasonPurchaseHK, otherInsurances,
                 // dependencies for PF fields
                 isPremiumFinancing, pfLoanAmount, pfLoanRate, pfLoanTenor, pfRepaymentAmount,
@@ -4549,6 +4697,10 @@ ${hnwFinancially || ''}`;
                         annualIncome: monthlyIncome ? Number(monthlyIncome) * 12 : 0,
                         premAmount, payMode, yearTerm,
                         paymentDate, paymentCurrency, paymentAmount, paymentPayor, paymentMethod,
+                        // Commission Spreading (Professional Investor - PI)
+                        commissionSpreading,
+                        piInvestorType,
+                        piScenarioKey,
                         isDateBack, birthdayAlert, appType,
                         fnaDisposableIncome: fnaDisposableIncome || null,
                         fnaIncomePercent: fnaIncomePercent || null,
@@ -4574,7 +4726,10 @@ ${hnwFinancially || ''}`;
                 } catch (err) {
                     console.error('Failed to save case summary policy info', err);
                 }
-            }, [policyHydrated, phArrivalDate, fnaSigningDate, proposalDate, applicationSigningDate, signingDate, addressProofType, isSamePerson, phAge, phGender, phSmoker, phDob, insAge, insGender, insSmoker, insDob, planName, sumAssured, curr, prodType, otherInsurances, height, weight, medicalReq, financialReq, returnCheck, monthlyIncome, occupationStatus, position, employer, location, lifeCiEmployerToggle, bizNature, sofWealthSupplementType, premAmount, payMode, yearTerm, paymentDate, paymentCurrency, paymentAmount, paymentPayor, paymentMethod, isDateBack, birthdayAlert, appType, trustDeclaration, pdfAmount, phResidency, phOtherCountry, reasonPurchaseHK, unpaidPremium, trustBeneficiaries, noFna,
+            }, [policyHydrated, phArrivalDate, fnaSigningDate, proposalDate, applicationSigningDate, signingDate, addressProofType, isSamePerson, phAge, phGender, phSmoker, phDob, insAge, insGender, insSmoker, insDob, planName, sumAssured, curr, prodType, otherInsurances, height, weight, medicalReq, financialReq, returnCheck, monthlyIncome, occupationStatus, position, employer, location, lifeCiEmployerToggle, bizNature, sofWealthSupplementType, premAmount, payMode, yearTerm, paymentDate, paymentCurrency, paymentAmount, paymentPayor, paymentMethod,
+                // Commission Spreading (Professional Investor - PI)
+                commissionSpreading, piInvestorType, piScenarioKey,
+                isDateBack, birthdayAlert, appType, trustDeclaration, pdfAmount, phResidency, phOtherCountry, reasonPurchaseHK, unpaidPremium, trustBeneficiaries, noFna,
                 // Premium Financing dependencies
                 isPremiumFinancing, pfLoanAmount, pfLoanRate, pfLoanTenor, pfRepaymentAmount]);
 
@@ -4590,6 +4745,10 @@ ${hnwFinancially || ''}`;
                 setPaymentDate(""); setPaymentCurrency("HKD"); setPaymentAmount(""); setPaymentPayor("Policyholder"); setPaymentMethod("Bank Transfer");
                 setTrustBeneficiaries([{ name: '', relationType: 'Self', relationDetail: '', percent: '' }]);
                 setUnpaidPremium(false); setReasonPurchaseHK('');
+                // Reset Commission Spreading (PI)
+                setCommissionSpreading(false);
+                setPiInvestorType('');
+                setPiScenarioKey('');
                 setOtherInsurances([{ name: '', currency: 'USD', amount: '' }]);
                 setNoFna(false);
 
@@ -5261,6 +5420,64 @@ ${hnwFinancially || ''}`;
                                         </div>
                                     </div>
                                 </div>
+
+                                {/* Commission Spreading (Standalone section below Payment Information) */}
+                                <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                                    <div className="flex items-center gap-2">
+                                        <input
+                                            type="checkbox"
+                                            checked={commissionSpreading}
+                                            onChange={(e) => {
+                                                const checked = e.target.checked;
+                                                setCommissionSpreading(checked);
+                                                if (!checked) {
+                                                    setPiInvestorType('');
+                                                    setPiScenarioKey('');
+                                                }
+                                            }}
+                                            className="rounded text-blue-600"
+                                        />
+                                        <label className="text-sm font-bold text-slate-700">Commission Spreading</label>
+                                    </div>
+
+                                    {commissionSpreading && (
+                                        <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+                                            <div>
+                                                <label className="text-xs font-bold text-slate-500">Investor Type</label>
+                                                <select
+                                                    value={piInvestorType}
+                                                    onChange={(e) => {
+                                                        const v = e.target.value;
+                                                        setPiInvestorType(v);
+                                                        setPiScenarioKey('');
+                                                    }}
+                                                    className="w-full border rounded p-1.5 text-sm"
+                                                >
+                                                    <option value="">Please select</option>
+                                                    {PI_INVESTOR_TYPES.map((t) => (
+                                                        <option key={t} value={t}>{t}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+
+                                            {piInvestorType && (
+                                                <div>
+                                                    <label className="text-xs font-bold text-slate-500">Scenario / Category</label>
+                                                    <select
+                                                        value={piScenarioKey}
+                                                        onChange={(e) => setPiScenarioKey(e.target.value)}
+                                                        className="w-full border rounded p-1.5 text-sm"
+                                                    >
+                                                        <option value="">Please select</option>
+                                                        {(PI_REQUIREMENTS[piInvestorType] || []).map((s) => (
+                                                            <option key={s.key} value={s.key}>{s.label}</option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -5718,6 +5935,21 @@ const showMed = (isPHNotSame && !isLifeOrCI)
 (C)  Have you spent more than 90 days in any other jurisdiction(s) during the previous year?
 (D)  In which jurisdiction(s) have you filed personal income tax returns during the previous year?`;
                     combined = combined ? (combined + "\n\n" + amlText) : amlText;
+                }
+
+                // Commission Spreading (Professional Investor - PI) -> append pending requirements to Issue UN
+                if (policyData.commissionSpreading && policyData.piScenarioKey) {
+                    const type = policyData.piInvestorType || '';
+                    const key = policyData.piScenarioKey || '';
+                    const scenario = (PI_REQUIREMENTS[type] || []).find((s) => s.key === key);
+                    const reqText = (scenario && scenario.requirementText) ? String(scenario.requirementText).trim() : '';
+                    if (reqText) {
+                        const csText = `${COMMISSION_SPREADING_PREFIX}\n${reqText}`;
+                        // Avoid accidental duplicates if the user has already pasted the prefix manually.
+                        if (!String(combined || '').includes(COMMISSION_SPREADING_PREFIX)) {
+                            combined = combined ? (combined + "\n\n" + csText) : csText;
+                        }
+                    }
                 }
 
                 setIssueUN(combined);
@@ -6593,9 +6825,21 @@ const shouldShowMed = () => {
         
         /* ========= Versioning & Update Log ========= */
         // Updated version constant to reflect latest enhancements
-        const CURRENT_VERSION = "v2.8.4";
+        const CURRENT_VERSION = "v2.8.5";
         const UPDATE_LOG_PASSWORD = "admin123";
         const versionHistory = [
+
+{
+    version: "v2.8.5",
+    date: "16 Jan 2026",
+    type: "Patch Update",
+    changes: [
+        "Implemented Commission Spreading module and PI Investor logic.",
+        "Added Commission Spreading inputs (checkbox + Investor Type + Scenario/Category) as a standalone row below Payment Information.",
+        "Case Summary (Section 13 - Issue UN): Appends Commission Spreading pending prefix + scenario requirement text from PI.txt when applicable.",
+        "Bumped application version to v2.8.5."
+    ]
+},
 
 {
     version: "v2.8.4",
