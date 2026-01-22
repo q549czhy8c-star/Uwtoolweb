@@ -5202,7 +5202,7 @@ ${hnwFinancially || ''}`;
                                         
                                         <div>
                                             <label className="text-xs font-bold text-slate-500">
-                                                {(prodType === 'Life' || prodType === 'CI') ? '受保人的職業身分' : '職業身分'}
+                                                {(prodType === 'Life' || prodType === 'CI') ? 『受保人的職業身分』 : 『職業身分』}
                                             </label>
                                             <select value={occupationStatus} onChange={(e) =>setOccupationStatus(e.target.value)} className="w-full border rounded p-1.5 text-sm bg-slate-50 font-medium">
                                                 <option value="Employed">受僱 (Employed)</option><option value="SelfEmployed">自僱 (Self-Employed)</option><option value="Housewife">家庭主婦 (Housewife)</option><option value="Student">全日制學生 (Student)</option><option value="Juvenile">兒童 (Juvenile)</option><option value="Unemployed">非在職人士 (Unemployed)</option><option value="Retiree">退休人士 (Retiree)</option>
@@ -6855,7 +6855,7 @@ const shouldShowMed = () => {
         "Revised the Financial Needs Analysis (FNA) suitability mapping (Part 2 Q1/Q2 and Part 3 Q6) to match the provided FNA mapping matrix.",
         "Bumped application version to v2.8.6."
     ]
-}
+},
 
 
 {
