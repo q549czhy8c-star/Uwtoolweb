@@ -98,6 +98,30 @@
         const SOF_OPTIONS = ["Salary", "Income", "Saving", "Investments", "Company sale /profits", "Premium Financing", "Others"];
         const SOW_OPTIONS = ["Income-savings from salary(basic and/or bonus)", "Company sale/profits", "Sale of shares or other investments", "Sale of property", "Others"];
 
+
+
+// ====== FNA Suitability Mapping Options (Part 2 / Part 3) ======
+const FNA_P2Q1_OPTIONS = [
+    { value: "A", label: "A" },
+    { value: "B(iii)", label: "B (iii)" },
+    { value: "C", label: "C" },
+    { value: "D", label: "D" },
+    { value: "E", label: "E" },
+    { value: "E(iii)", label: "E (iii)" },
+    { value: "F", label: "F" },
+    { value: "G", label: "G" }
+];
+
+const FNA_P2_SINGLE_OPTIONS = [
+    { value: "", label: "請選擇..." },
+    { value: "A", label: "A" },
+    { value: "B", label: "B" },
+    { value: "C", label: "C" },
+    { value: "D", label: "D" },
+    { value: "E", label: "E" },
+    { value: "F", label: "F" },
+    { value: "G", label: "G" }
+];
         // ==========================================================
         // Commission Spreading (Professional Investor - PI) Mapping
         // Hardcoded from PI.txt (standalone HTML requirement)
@@ -2409,28 +2433,30 @@ const HK_HOLIDAYS_2025_2026 = [
 
 
         const PRODUCT_DB = [
-            
-// GIO
-{ name: "LionTycoon Beyond 2", type: "GIO", q1: "A (Optional), C (Optional), D (Optional), E, E(iii)", q2: "A", q6: "A - F (2 Pay / 5 Pay); B - F (8 Pay / 10 Pay)", ruleType: "GIO" },
-{ name: "Lion Achiever", type: "GIO", q1: "A (Optional), C (Optional), D (Optional), E, E(iii)", q2: "A", q6: "A - F", ruleType: "GIO" },
-{ name: "LionPrima", type: "GIO", q1: "A (Optional), C (Optional), D (Optional), E, E(iii)", q2: "A", q6: "A - F (2 Pay / 5 Pay); B - F (8 Pay)", ruleType: "GIO" },
-{ name: "LionAchiever Elite", type: "GIO", q1: "A (Optional), C (Optional), D (Optional), E, E(iii)", q2: "A", q6: "A - F", ruleType: "GIO" },
-{ name: "Emerald (Launch date TBC)", type: "GIO", q1: "A (Optional), C (Optional), D (Optional), E, E(iii)", q2: "A", q6: "G", ruleType: "GIO" },
-{ name: "Pearl (Launch date TBC)", type: "GIO", q1: "A (Optional), C (Optional), D (Optional), E, E(iii)", q2: "A", q6: "A - F", ruleType: "GIO" },
-{ name: "LionTycoon Beyond Savings Insurance Plan 3 (Launch date TBC)", type: "GIO", q1: "A (Optional), C (Optional), D (Optional), E, E(iii)", q2: "A", q6: "A - F (3 Pay); B - F (8 Pay); Single payment", ruleType: "GIO" },
-// Life
-{ name: "Generali Supreme Gold", type: "Life", q1: "A", q2: "C", q6: "≥ protection period", ruleType: "LIFE" },
-{ name: "LionPainter Flexi", type: "Life", q1: "A, D", q2: "C", q6: "≥ protection period", ruleType: "LIFE" },
-{ name: "LionPromise Pro", type: "Life", q1: "A (Optional), C and/or D, E(iii)", q2: "A", q6: "A - F (2 Pay / 5 Pay)", ruleType: "LIFE" },
-{ name: "LionPatron", type: "Life", q1: "A, D (Optional), E(iii)", q2: "A", q6: "A - F (5 Pay); B - F (10 Pay); D - F (20 Pay)", ruleType: "LIFE", multiplier: 1.5, fnaBaseMultiplier: 2.3 },
-// CI
-{ name: "LionGuardian PlusOne", type: "CI", q1: "A, B(iii)", q2: "C", q6: "≥ protection period", ruleType: "CI" },
-{ name: "LionGuardian Beyond", type: "CI", q1: "A, B(iii) (Optional: D, E; if D is selected, E must also be selected)", q2: "A", q6: "B - F (10 Pay); D - F (20 Pay); E - F (25 Pay); B (To age 65: age 55); C (To age 65: age 50 - 55 or To age 22: age 7 - 11); D (To age 65: age 45 - 55 or To age 22: age 2 - 11); E - F (To age 65: age 0 - 55 or To age 22: age 0 - 11)", ruleType: "CI", multiplier: 1.3 },
-{ name: "LionAlong", type: "CI", q1: "A, B(iii) (Optional: D, E; if D is selected, E must also be selected)", q2: "A", q6: "B - F (10 Pay); D - F (20 Pay); E - F (25 Pay)", ruleType: "CI" },
-// Annuity
-{ name: "LionHarvest Prime", type: "Annuity", q1: "A(Optional), C and/or D, E(iii)", q2: "A", q6: "A - F (5 Pay); B - F (10 Pay)", ruleType: "GIO" },
-// High Net Worth product
-{ name: "LionMaster", type: "HNW", q1: "A", q2: "C", q6: "≥ protection period", ruleType: "HNW" }];
+            // GIO
+            { name: "LionTycoon Beyond 2", type: "GIO", q1: "A (Optional), C (Optional), D (Optional), E, E(iii)", q2: "A", q3: "F - G", q6: "A - F (2 Pay / 5 Pay); B - F (8 Pay / 10 Pay)", ruleType: "GIO" },
+            { name: "Lion Achiever", type: "GIO", q1: "Must: E === Optional: A, C, D", q2: "F, G", q6: "Must be equal or greater than payment term", ruleType: "GIO" },
+            { name: "LionPrima", type: "GIO", q1: "A (Optional), C (Optional), D (Optional), E, E(iii)", q2: "A", q3: "E - G", q6: "A - F (2 Pay / 5 Pay); B - F (8 Pay)", ruleType: "GIO" },
+            { name: "Emerald (Launch date TBC)", type: "GIO", q1: "A (Optional), C (Optional), D (Optional), E, E(iii)", q2: "A", q3: "D - G", q6: "G", ruleType: "GIO" },
+            { name: "Pearl (Launch date TBC)", type: "GIO", q1: "A (Optional), C (Optional), D (Optional), E, E(iii)", q2: "A", q3: "D - G", q6: "A - F", ruleType: "GIO" },
+            { name: "LionTycoon Beyond Savings Insurance Plan 3 (Launch date TBC)", type: "GIO", q1: "A (Optional), C (Optional), D (Optional), E, E(iii)", q2: "A", q3: "F - G", q6: "A - F (3 Pay); B - F (8 Pay); Single payment", ruleType: "GIO" },
+
+            { name: "LionAchiever Elite", type: "GIO", q1: "A (Optional), C (Optional), D (Optional), E, E(iii)", q2: "A", q3: "E - G", q6: "A - F", ruleType: "GIO" },
+            // Life
+            { name: "Generali Supreme Gold", type: "Life", q1: "A", q2: "C", q3: "B - F", q6: "≥ protection period", ruleType: "LIFE" },
+            { name: "LionPainter Flexi", type: "Life", q1: "A, D", q2: "C", q3: "B - C (10 Years PPT); B - D (11 - 15 Years PPT); B - E (16 - 20 Years PPT); B - F (21 - 25 Years PPT)", q6: "≥ protection period", ruleType: "LIFE" },
+            { name: "LionPromise Pro", type: "Life", q1: "A(Optional), C and/or D, E(iii)", q2: "A", q3: "F - G", q6: "A - F (2 Pay / 5 Pay)", ruleType: "LIFE" },
+            { name: "LionPatron", type: "Life", q1: "A, D (Optional), E(iii)", q2: "A", q3: "B - G", q6: "A - F (5 Pay); B - F (10 Pay); D - F (20 Pay)", ruleType: "LIFE", multiplier: 1.5, fnaBaseMultiplier: 2.3 },
+            // CI
+            { name: "LionGuardian PlusOne", type: "CI", q1: "A, B (iii)", q2: "C", q3: "B - G", q6: "≥ protection period", ruleType: "CI" },
+            { name: "LionGuardian Beyond", type: "CI", q1: "A, B (iii), D (Optional), E (Optional) ** If D is selected, E must also be selected **", q2: "A", q3: "C - G", q6: "B - F (10 Pay); D - F (20 Pay); E - F (25 Pay); B (To age 65: age 55); C (To age 65: age 50 - 55 or To age 22: age 7 - 11); D (To age 65: age 45 - 55 or To age 22: age 2 - 11); E - F (To age 65: age 0 - 55 or To age 22: age 0 - 11)", ruleType: "CI", multiplier: 1.3 },
+            { name: "LionAlong", type: "CI", q1: "A, B (iii), D (Optional), E (Optional) ** If D is selected, E must also be selected **", q2: "A", q3: "C - G", q6: "B - F (10 Pay); D - F (20 Pay); E - F (25 Pay)", ruleType: "CI" },
+            // Annuity
+            { name: "LionHarvest Prime", type: "Annuity", q1: "A(Optional), C and/or D, E(iii)", q2: "A", q3: "E - F", q6: "A - F (5 Pay); B - F (10 Pay)", ruleType: "GIO" }
+            ,
+            // [NEW] High Net Worth product
+            { name: "LionMaster", type: "HNW", q1: "A", q2: "C", q3: "B - G", q6: "≥ protection period", ruleType: "HNW" }
+        ];
 
         const MED_RULE_CI = [
             { maxUSD: 50000, req: ["NM", "NM", "NM", "NM", "NM", "NM"] },
@@ -3756,6 +3782,12 @@ const [addressProofType, setAddressProofType] = useState('');
             const [targetYear, setTargetYear] = useState("");
             const [surrenderValueUSD, setSurrenderValueUSD] = useState("");
             const [yearTerm, setYearTerm] = useState("");
+
+// ====== FNA Suitability Mapping Inputs (Part 2 / Part 3) ======
+const [fnaP2Q1, setFnaP2Q1] = useState([]);   // multi-select (e.g., A, C, D, E(iii))
+const [fnaP2Q2, setFnaP2Q2] = useState("");   // single-select (A / C etc.)
+const [fnaP2Q3, setFnaP2Q3] = useState("");   // single-select (A - G)
+const [fnaP3Q6, setFnaP3Q6] = useState("");   // single-select (A - G)
     // --- Premium Financing (PF) fields ---
     // Flag to indicate whether the current case uses premium financing. When checked, the
     // additional loan details will be collected and persisted along with other policy data.
@@ -4466,13 +4498,138 @@ ${hnwFinancially || ''}`;
             }, [sumAssured, curr, planName, targetSavingHKD, prodType]);
 
             const returnCheck = useMemo(() => {
-                if (!targetSavingHKD || !surrenderValueUSD) return null;
-                const target = Number(targetSavingHKD);
-                const svHKD = Number(surrenderValueUSD) * 7.8; 
-                let status = "PASS";
-                if (svHKD < target * 0.95) status = "FAIL";
-                return { status };
-            }, [targetSavingHKD, surrenderValueUSD]);
+    // ===== Suitability Check (95% Rule + FNA Mapping) =====
+    const issues = [];
+
+    // --- A) Existing 95% Rule (Target Saving vs Surrender Value) ---
+    let targetStatus = null;
+    if (targetSavingHKD && surrenderValueUSD) {
+        const target = Number(targetSavingHKD);
+        const svHKD = Number(surrenderValueUSD) * 7.8;
+        targetStatus = (svHKD < target * 0.95) ? "FAIL" : "PASS";
+        if (targetStatus === "FAIL") issues.push("退保價值低於目標儲蓄 95% (95% Rule FAIL)");
+    }
+
+    // --- B) FNA Mapping (Part 2 Q1/Q2/Q3 vs Selected Plan) ---
+    let fnaStatus = null;
+    const prod = selectedProductData;
+    const hasMapping = !!(prod && (prod.q1 || prod.q2 || prod.q3));
+    if (!noFna && hasMapping) {
+        const parseTokens = (raw) => {
+            if (!raw) return { required: [], optional: [], orGroup: null, deps: [] };
+            // handle inline note: ** If D is selected, E must also be selected **
+            const dep = /If\s+D\s+is\s+selected,\s*E\s+must\s+also\s+be\s+selected/i.test(raw);
+            const cleaned = raw.replace(/\*\*.*?\*\*/g, "").trim();
+
+            const tokens = cleaned.split(",").map(s => s.trim()).filter(Boolean);
+            const required = [];
+            const optional = [];
+            let orGroup = null;
+
+            tokens.forEach(t => {
+                // "C and/or D"
+                if (/and\/or/i.test(t)) {
+                    const parts = t.split(/and\/or/i).map(x => x.trim()).filter(Boolean);
+                    if (parts.length >= 2) orGroup = parts;
+                    return;
+                }
+                const isOptional = /\(\s*Optional\s*\)/i.test(t);
+                const val = t.replace(/\(\s*Optional\s*\)/i, "").trim();
+                if (!val) return;
+                if (isOptional) optional.push(val);
+                else required.push(val);
+            });
+
+            const deps = [];
+            if (dep) deps.push({ ifHas: "D", mustAlsoHave: "E" });
+
+            return { required, optional, orGroup, deps };
+        };
+
+        const parseRange = (raw) => {
+            if (!raw) return [];
+            const r = raw.trim();
+            const m = r.match(/^([A-G])\s*-\s*([A-G])$/i);
+            if (m) {
+                const a = m[1].toUpperCase().charCodeAt(0);
+                const b = m[2].toUpperCase().charCodeAt(0);
+                const out = [];
+                for (let c = a; c <= b; c++) out.push(String.fromCharCode(c));
+                return out;
+            }
+            return r.split(/[,;]/).map(x => x.trim()).filter(Boolean);
+        };
+
+        const q1Rules = parseTokens(prod.q1);
+        const q2Allowed = parseRange(prod.q2);
+        const q3Allowed = parseRange(prod.q3);
+
+        // Q1 (multi-select)
+        if (!Array.isArray(fnaP2Q1) || fnaP2Q1.length === 0) {
+            fnaStatus = "FAIL";
+            issues.push("請完成 FNA Part 2 Q1 (Reason for purchase)");
+        } else {
+            const selected = fnaP2Q1.map(x => String(x).trim());
+            const allowedSet = new Set([...(q1Rules.required || []), ...(q1Rules.optional || []), ...(q1Rules.orGroup || [])]);
+            const invalid = selected.filter(x => !allowedSet.has(x));
+            if (invalid.length) {
+                fnaStatus = "FAIL";
+                issues.push(`FNA Part 2 Q1 選項不符合此計劃: ${invalid.join(", ")}`);
+            }
+            const missingReq = (q1Rules.required || []).filter(x => !selected.includes(x));
+            if (missingReq.length) {
+                fnaStatus = "FAIL";
+                issues.push(`FNA Part 2 Q1 缺少必選: ${missingReq.join(", ")}`);
+            }
+            if (q1Rules.orGroup && q1Rules.orGroup.length) {
+                const ok = q1Rules.orGroup.some(x => selected.includes(x));
+                if (!ok) {
+                    fnaStatus = "FAIL";
+                    issues.push(`FNA Part 2 Q1 需選其一: ${q1Rules.orGroup.join(" / ")}`);
+                }
+            }
+            (q1Rules.deps || []).forEach(d => {
+                if (selected.includes(d.ifHas) && !selected.includes(d.mustAlsoHave)) {
+                    fnaStatus = "FAIL";
+                    issues.push(`FNA Part 2 Q1：如選 ${d.ifHas} 必須同時選 ${d.mustAlsoHave}`);
+                }
+            });
+        }
+
+        // Q2 (single-select)
+        if (!fnaP2Q2) {
+            fnaStatus = fnaStatus || "FAIL";
+            issues.push("請完成 FNA Part 2 Q2");
+        } else if (q2Allowed.length && !q2Allowed.includes(fnaP2Q2)) {
+            fnaStatus = "FAIL";
+            issues.push(`FNA Part 2 Q2 不符合此計劃 (需要: ${q2Allowed.join(", ")})`);
+        }
+
+        // Q3 (single-select)
+        if (!fnaP2Q3) {
+            fnaStatus = fnaStatus || "FAIL";
+            issues.push("請完成 FNA Part 2 Q3 (Type of insurance)");
+        } else if (q3Allowed.length && !q3Allowed.includes(fnaP2Q3)) {
+            fnaStatus = "FAIL";
+            issues.push(`FNA Part 2 Q3 不符合此計劃 (需要: ${q3Allowed.join(", ")})`);
+        }
+
+        // Q6 (optional strictness — only validate if user inputs)
+        if (fnaP3Q6 && prod.q6) {
+            const q6Allowed = parseRange(prod.q6);
+            if (q6Allowed.length && !q6Allowed.includes(fnaP3Q6)) {
+                fnaStatus = "FAIL";
+                issues.push(`FNA Part 3 Q6 不符合此計劃 (參考: ${prod.q6})`);
+            }
+        }
+
+        if (!fnaStatus) fnaStatus = "PASS";
+    }
+
+    let status = "PASS";
+    if (targetStatus === "FAIL" || fnaStatus === "FAIL") status = "FAIL";
+    return { status, targetStatus, fnaStatus, issues };
+}, [targetSavingHKD, surrenderValueUSD, selectedProductData, noFna, fnaP2Q1, fnaP2Q2, fnaP2Q3, fnaP3Q6]);
 
             const medicalReq = useMemo(() => {
                 const checkAge = insuredAgeForCalc;
@@ -5201,9 +5358,7 @@ ${hnwFinancially || ''}`;
                                         )}
                                         
                                         <div>
-                                            <label className="text-xs font-bold text-slate-500">
-                                                {(prodType === 'Life' || prodType === 'CI') ? 『受保人的職業身分』 : 『職業身分』}
-                                            </label>
+                                            <label className="text-xs font-bold text-slate-500">{(prodType === "Life" || prodType === "CI") ? "受保人的職業身分" : "職業身分"}</label>
                                             <select value={occupationStatus} onChange={(e) =>setOccupationStatus(e.target.value)} className="w-full border rounded p-1.5 text-sm bg-slate-50 font-medium">
                                                 <option value="Employed">受僱 (Employed)</option><option value="SelfEmployed">自僱 (Self-Employed)</option><option value="Housewife">家庭主婦 (Housewife)</option><option value="Student">全日制學生 (Student)</option><option value="Juvenile">兒童 (Juvenile)</option><option value="Unemployed">非在職人士 (Unemployed)</option><option value="Retiree">退休人士 (Retiree)</option>
                                             </select>
@@ -5341,9 +5496,38 @@ ${hnwFinancially || ''}`;
                                                 <div className="space-y-2 text-xs">
                                                     <div className="flex gap-2"><span className="font-bold text-blue-600 min-w-[60px]">Part 2 Q1:</span><span className="text-slate-700">{selectedProductData.q1}</span></div>
                                                     <div className="flex gap-2"><span className="font-bold text-blue-600 min-w-[60px]">Part 2 Q2:</span><span className="text-slate-700">{selectedProductData.q2}</span></div>
-                                                    <div className="flex gap-2"><span className="font-bold text-blue-600 min-w-[60px]">Part 3 Q6:</span><span className="text-slate-700">{selectedProductData.q6}</span></div>
+                                                                                                        <div className="flex gap-2"><span className="font-bold text-blue-600 min-w-[60px]">Part 2 Q3:</span><span className="text-slate-700">{selectedProductData.q3}</span></div>
+<div className="flex gap-2"><span className="font-bold text-blue-600 min-w-[60px]">Part 3 Q6:</span><span className="text-slate-700">{selectedProductData.q6}</span></div>
                                                 </div>
                                             ) : <div className="text-xs text-slate-400 italic py-2 text-center">請選擇計劃名稱</div>}
+
+<div className="bg-white p-4 rounded border border-slate-200 mb-4">
+    <div className="text-xs font-bold text-slate-600 mb-2 border-b border-slate-200 pb-1">FNA 適當性選項 (用於 mapping 檢查)</div>
+    <div className="grid grid-cols-2 gap-3">
+        <div>
+            <label className="text-xs font-bold text-slate-500 block mb-1">Part 2 Q1 (multi)</label>
+            <MultiSelect options={FNA_P2Q1_OPTIONS} value={fnaP2Q1} onChange={setFnaP2Q1} placeholder="請選擇..." />
+        </div>
+        <div>
+            <label className="text-xs font-bold text-slate-500 block mb-1">Part 2 Q2</label>
+            <select value={fnaP2Q2} onChange={(e)=>setFnaP2Q2(e.target.value)} className="w-full border rounded p-1.5 text-sm">
+                {FNA_P2_SINGLE_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+        </div>
+        <div>
+            <label className="text-xs font-bold text-slate-500 block mb-1">Part 2 Q3</label>
+            <select value={fnaP2Q3} onChange={(e)=>setFnaP2Q3(e.target.value)} className="w-full border rounded p-1.5 text-sm">
+                {FNA_P2_SINGLE_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+        </div>
+        <div>
+            <label className="text-xs font-bold text-slate-500 block mb-1">Part 3 Q6</label>
+            <select value={fnaP3Q6} onChange={(e)=>setFnaP3Q6(e.target.value)} className="w-full border rounded p-1.5 text-sm">
+                {FNA_P2_SINGLE_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+        </div>
+    </div>
+</div>
                                         </div>
                                         <div className="space-y-3">
                                             <div><label className="text-xs font-bold text-slate-500">簽署日期</label><input type="date" value={fnaSigningDate} onChange={(e) =>setFnaSigningDate(e.target.value)} className="w-full border rounded p-1.5 text-sm" /></div>
@@ -5365,8 +5549,14 @@ ${hnwFinancially || ''}`;
                                             {returnCheck && (
                                                 <div className={`p-3 rounded border text-sm font-bold flex items-center gap-2 ${returnCheck.status==='PASS'?'bg-green-50 border-green-200 text-green-700':'bg-red-50 border-red-200 text-red-700'}`}>
                                                     {returnCheck.status==='PASS' ? <Check size={16}/> : <AlertTriangle size={16}/>}
-                                                    {returnCheck.status==='PASS' ? '退保價值符合目標 (95% Rule PASS)' : '退保價值低於目標儲蓄 95%'}
+                                                    {returnCheck.status==='PASS' ? '適當性檢查通過 (FNA Mapping / 95% Rule)' : '適當性檢查未通過 (請查看原因)'}
                                                 </div>
+                                                    {returnCheck.issues && returnCheck.issues.length > 0 && (
+                                                        <ul className="mt-2 list-disc pl-5 text-[11px] space-y-1">
+                                                            {returnCheck.issues.slice(0, 6).map((it, idx) => <li key={idx}>{it}</li>)}
+                                                        </ul>
+                                                    )}
+
                                             )}
                                         </div>
                                         <div className="mt-4 space-y-3">
@@ -6832,6 +7022,14 @@ const shouldShowMed = () => {
         const CURRENT_VERSION = "v2.8.6";
         const UPDATE_LOG_PASSWORD = "admin123";
         const versionHistory = [
+{
+    version: "v2.8.6",
+    date: "22 Jan 2026",
+    type: "Patch Update",
+    changes: [
+        "Updated Occupation label for Life/CI, added new GIO plans, and revised FNA Suitability Mapping."
+    ]
+},
 
 {
     version: "v2.8.5",
@@ -6844,19 +7042,6 @@ const shouldShowMed = () => {
         "Bumped application version to v2.8.5."
     ]
 },
-,
-{
-    version: "v2.8.6",
-    date: "22 Jan 2026",
-    type: "Patch Update",
-    changes: [
-        "Updated the '職業身分' field label so that for Life and Critical Illness (CI) plans it displays '受保人的職業身分' (Insured's Occupation Status).",
-        "Added new Guaranteed Insurability Option (GIO) plans – Emerald (Launch date TBC), Pearl (Launch date TBC), and LionTycoon Beyond Savings Insurance Plan 3 (Launch date TBC).",
-        "Revised the Financial Needs Analysis (FNA) suitability mapping (Part 2 Q1/Q2 and Part 3 Q6) to match the provided FNA mapping matrix.",
-        "Bumped application version to v2.8.6."
-    ]
-},
-
 
 {
     version: "v2.8.4",
