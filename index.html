@@ -5547,6 +5547,7 @@ ${hnwFinancially || ''}`;
                                                 </div>
                                             )}
                                             {returnCheck && (
+                                                <>
                                                 <div className={`p-3 rounded border text-sm font-bold flex items-center gap-2 ${returnCheck.status==='PASS'?'bg-green-50 border-green-200 text-green-700':'bg-red-50 border-red-200 text-red-700'}`}>
                                                     {returnCheck.status==='PASS' ? <Check size={16}/> : <AlertTriangle size={16}/>}
                                                     {returnCheck.status==='PASS' ? '適當性檢查通過 (FNA Mapping / 95% Rule)' : '適當性檢查未通過 (請查看原因)'}
@@ -5557,6 +5558,7 @@ ${hnwFinancially || ''}`;
                                                         </ul>
                                                     )}
 
+                                                </>
                                             )}
                                         </div>
                                         <div className="mt-4 space-y-3">
