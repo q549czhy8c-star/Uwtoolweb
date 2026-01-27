@@ -5584,6 +5584,9 @@ ${hnwFinancially || ''}`;
             const buildSummaryLines = () => {
                 if (!policyData) return [];
                 const lines = [];
+                const pdfSuffixStr = (policyData.payMode === 'Prepay' && policyData.pdfAmount)
+                    ? ` (PDF amount: ${formatMoney(Number(policyData.pdfAmount), policyData.curr || 'HKD')})`
+                    : '';
                 // Show residency for non‑HK residents
                 if (policyData.phResidency && policyData.phResidency !== 'HK') {
                     let country = '';
@@ -5639,7 +5642,7 @@ if (isJobMonthlyPlan) {
     lines.push(`Monthly Income: ${formatHKDPlain(policyData.monthlyIncome)}`);
 }
 
-                lines.push(`Applying: ${policyData.planName || ''} ${policyData.curr || ''} ${policyData.sumAssured || ''}`);
+                lines.push(`Applying: ${policyData.planName || ''} ${policyData.curr || ''} ${policyData.sumAssured || ''}${pdfSuffixStr}`);
                 // Premium Financing details
                 if (policyData.isPremiumFinancing) {
                     lines.push('Premium Financing: Yes');
@@ -5755,9 +5758,8 @@ const showMed = (isPHNotSame && !isLifeOrCI)
                     const preIncomeSufficient = preRetireShortfallSum === 0 && incomeUsed >= annualTotalHKD;
                     const mode = affordData.calcMode;
                     let totalPremHKD = res.grossTotalDisplay;
-                    const pdfSuffixStr = (policyData.payMode === 'Prepay' && policyData.pdfAmount) ? ` (PDF amount: ${formatMoney(Number(policyData.pdfAmount), policyData.curr || 'HKD')})` : '';
                     if (isSplitScenario) {
-                        lines.push(`   Total Annual Premiums before retirement: ${formatMoney(annualTotalHKD, 'HKD')}${pdfSuffixStr}`);
+                        lines.push(`   Total Annual Premiums before retirement: ${formatMoney(annualTotalHKD, 'HKD')}`);
                         lines.push(`   Income used for each year prior to retirement: ${formatMoney(incomeUsed)}`);
                         lines.push(`   Total premiums (need to be supported by net asset) after retirement: ${formatMoney(postRetTotalHKD)}`);
                         // When Premium Financing is used, insert Asset Required above Net assets available for use
@@ -5772,14 +5774,14 @@ const showMed = (isPHNotSame && !isLifeOrCI)
                         const isApplyingOnly = policyCount === 1;
                         if (policyCount > 1) lines.push('   (All policies)');
                         if (!hasOverhang) {
-                            lines.push(`   ${isApplyingOnly ? 'Annual premium' : 'Total annual premiums'}: ${formatMoney(annualTotalHKD, 'HKD')}${pdfSuffixStr}`);
+                            lines.push(`   ${isApplyingOnly ? 'Annual premium' : 'Total annual premiums'}: ${formatMoney(annualTotalHKD, 'HKD')}`);
                         } else if (preIncomeSufficient) {
                             // Edge case fix: If pre-retirement income is sufficient, show annual recurring amount even if post-retirement assets fail.
-                            lines.push(`   ${isApplyingOnly ? 'Annual premium' : 'Total Annual Premiums'}: ${formatMoney(annualTotalHKD, 'HKD')}${pdfSuffixStr}`);
+                            lines.push(`   ${isApplyingOnly ? 'Annual premium' : 'Total Annual Premiums'}: ${formatMoney(annualTotalHKD, 'HKD')}`);
                         } else if (mode === 'income') {
-                            lines.push(`   ${isApplyingOnly ? 'Annual premium' : 'Total annual premiums'}: ${formatMoney(totalPremHKD, 'HKD')}${pdfSuffixStr}`);
+                            lines.push(`   ${isApplyingOnly ? 'Annual premium' : 'Total annual premiums'}: ${formatMoney(totalPremHKD, 'HKD')}`);
                         } else {
-                            lines.push(`   Total Premiums: ${formatMoney(totalPremHKD, 'HKD')}${pdfSuffixStr}`);
+                            lines.push(`   Total Premiums: ${formatMoney(totalPremHKD, 'HKD')}`);
                         }
                         lines.push(`   Income used for each year prior to retirement: ${formatMoney(incomeUsed)}`);
                         if (!res.isPass && hasOverhang) {
@@ -6336,7 +6338,7 @@ const shouldShowMed = () => {
     </>
 )}
 
-                        <div><span className="font-bold">5. Applying:</span> {policyData.planName || ''} {policyData.curr || ''} {policyData.sumAssured || ''}</div>
+                        <div><span className="font-bold">5. Applying:</span> {policyData.planName || ''} {policyData.curr || ''} {policyData.sumAssured || ''}{(policyData.payMode === 'Prepay' && policyData.pdfAmount) ? ` (PDF amount: ${formatMoney(Number(policyData.pdfAmount), policyData.curr || 'HKD')})` : ''}</div>
                         {/* Premium Financing details under Applying */}
                         {policyData.isPremiumFinancing ? (
                             <div className="pl-4 text-sm">
@@ -6442,7 +6444,7 @@ const shouldShowMed = () => {
                         const isApplyingOnly = policyCount === 1;
                                     const prefix = policyCount > 1 ? '(All policies) - ' : '';
                                     if (isSplitScenario) {
-                                        lines.push(<div key="fnaSplit1" className="pl-4">Total Annual Premiums before retirement: {formatMoney(annualTotalHKD, 'HKD')}{pdfSuffix}</div>);
+                                        lines.push(<div key="fnaSplit1" className="pl-4">Total Annual Premiums before retirement: {formatMoney(annualTotalHKD, 'HKD')}</div>);
                                         lines.push(<div key="fnaSplit2" className="pl-4">Income used for each year prior to retirement: {formatMoney(incomeUsed)}</div>);
                                         lines.push(<div key="fnaSplit3" className="pl-4">Total premiums (need to be supported by net asset) after retirement: {formatMoney(postRetTotalHKD)}</div>);
                                         // Insert Asset Required row when Premium Financing is active
