@@ -10,7 +10,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Updated version title -->
-    <title>UW assessment tool (v2.8.626)</title>
+    <title>UW assessment tool (v2.8.627)</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -6547,7 +6547,7 @@ const shouldShowMed = () => {
                                             {policyData.fnaSow && policyData.fnaSow.length ? <div>SoW: {policyData.fnaSow.join(', ')}</div> : null}
                                             {assetHKD && disposableMonthly ? <div>Assets take approx {years.toFixed(1)} years of disposable income to accumulate</div> : null}
                                             {assetHKD ? <div>=> SoF and SoW appears to be commensurate with {holder}’s background and no suspicions are found.</div> : null}
-                                            {assetHKD ? <div>{(ageNum && years > ageNum) ? `Considering the ${holder}’s age (${ageStr}) and the occupation, it is NOT reasonable to save the asset of ${formatHKDSign(assetHKD)}.` : `Considering the ${holder}’s age (${ageStr}) and the occupation, it is reasonable to save the asset of ${formatHKDSign(assetHKD)} => Suggest accepting AML.`}</div> : null}
+                                            {assetHKD ? <div>{(ageNum && (ageNum - years) < 18) ? `Considering the ${holder}’s age (${ageStr}) and the occupation, it is NOT reasonable to save the asset of ${formatHKDSign(assetHKD)}.` : `Considering the ${holder}’s age (${ageStr}) and the occupation, it is reasonable to save the asset of ${formatHKDSign(assetHKD)} => Suggest accepting AML.`}</div> : null}
                                         </div>
                                     );
                                 })()}
@@ -6902,15 +6902,16 @@ const shouldShowMed = () => {
         
         /* ========= Versioning & Update Log ========= */
         // Updated version constant to reflect latest enhancements
-        const CURRENT_VERSION = "v2.8.626";
+        const CURRENT_VERSION = "v2.8.627";
         const UPDATE_LOG_PASSWORD = "admin123";
         const versionHistory = [
 {
-    version: "v2.8.626",
+    version: "v2.8.627",
     date: "30 Jan 2026",
     type: "Patch Update",
     changes: [
-        "Policy Info: When 'Broker = Everest Global' is ticked, also require/display Employer Name and Work Location fields (same as Trust/High Risk trigger)."
+        "Policy Info: When 'Broker = Everest Global' is ticked, also require/display Employer Name and Work Location fields (same as Trust/High Risk trigger).",
+        "Case Summary: When (Policyholder’s age − Assets take approx. years) < 18, show 'it is NOT reasonable to save the asset of xxxxx' and hide '=> Suggest accepting AML.' (Preview and Copy All synced)."
     ]
 },
 
@@ -6928,7 +6929,7 @@ const shouldShowMed = () => {
     date: "28 Jan 2026",
     type: "Patch Update",
     changes: [
-        "Case Summary: If assets take approx. years exceeds Policyholder’s age, show 'NOT reasonable to save the asset' and hide AML suggestion."
+        "Case Summary: When (Policyholder’s age − Assets take approx. years) < 18, show 'it is NOT reasonable to save the asset of xxxxx' and hide '=> Suggest accepting AML.' (Preview and Copy All synced)."
     ]
 },
 {
