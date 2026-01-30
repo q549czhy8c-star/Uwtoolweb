@@ -10,7 +10,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Updated version title -->
-    <title>UW assessment tool (v2.8.6)</title>
+    <title>UW assessment tool (v2.8.623)</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -2452,7 +2452,7 @@ const HK_HOLIDAYS_2025_2026 = [
             { name: "LionGuardian Beyond", type: "CI", q1: "A, B (iii), D (Optional), E (Optional) ** If D is selected, E must also be selected **", q2: "A", q3: "C - G", q6: "B - F (10 Pay); D - F (20 Pay); E - F (25 Pay); B (To age 65: age 55); C (To age 65: age 50 - 55 or To age 22: age 7 - 11); D (To age 65: age 45 - 55 or To age 22: age 2 - 11); E - F (To age 65: age 0 - 55 or To age 22: age 0 - 11)", ruleType: "CI", multiplier: 1.3 },
             { name: "LionAlong", type: "CI", q1: "A, B (iii), D (Optional), E (Optional) ** If D is selected, E must also be selected **", q2: "A", q3: "C - G", q6: "B - F (10 Pay); D - F (20 Pay); E - F (25 Pay)", ruleType: "CI" },
             // Annuity
-            { name: "LionHarvest Prime", type: "Annuity", q1: "A(Optional), C and/or D, E(iii)", q2: "A", q3: "E - F", q6: "A - F (5 Pay); B - F (10 Pay)", ruleType: "GIO" }
+            { name: "LionHarvest Prime", type: "Annuity", q1: "A(Optional), C and/or D", q2: "A", q3: "E - F", q6: "A - F (5 Pay); B - F (10 Pay)", ruleType: "GIO" }
             ,
             // [NEW] High Net Worth product
             { name: "LionMaster", type: "HNW", q1: "A", q2: "C", q3: "B - G", q6: "≥ protection period", ruleType: "HNW" }
@@ -5872,15 +5872,20 @@ const showMed = (isPHNotSame && !isLifeOrCI)
                         }
                         if (policyData.fnaSof && policyData.fnaSof.length) lines.push(`   SoF: ${policyData.fnaSof.join(', ')}`);
                         if (policyData.fnaSow && policyData.fnaSow.length) lines.push(`   SoW: ${policyData.fnaSow.join(', ')}`);
+                        const yearsToAccumulate = (assetHKD && disposableMonthly) ? (assetHKD / (disposableMonthly * 12)) : 0;
                         if (assetHKD && disposableMonthly) {
-                            const years = disposableMonthly > 0 ? (assetHKD / (disposableMonthly * 12)) : 0;
-                            lines.push(`   Assets take approx ${years.toFixed(1)} years of disposable income to accumulate`);
+                            lines.push(`   Assets take approx ${yearsToAccumulate.toFixed(1)} years of disposable income to accumulate`);
                         }
                         const holder = policyData.appType === 'Trust' ? 'Settlor' : 'Policyholder';
                         const ageStr = policyData.phAge !== undefined ? policyData.phAge : '';
+                                                const ageNum = Number(ageStr) || 0;
                         if (assetHKD) {
                             lines.push(`   => SoF and SoW appears to be commensurate with ${holder}’s background and no suspicions are found.`);
+                            if (ageNum && yearsToAccumulate > ageNum) {
+                            lines.push(`   Considering the ${holder}’s age (${ageStr}) and the occupation, it is NOT reasonable to save the asset of ${formatHKDSign(assetHKD)}.`);
+                        } else {
                             lines.push(`   Considering the ${holder}’s age (${ageStr}) and the occupation, it is reasonable to save the asset of ${formatHKDSign(assetHKD)} => Suggest accepting AML.`);
+                        }
                         }
                     }
                 } else if (policyData.planName && (policyData.planName.toLowerCase().includes('supreme gold') || policyData.planName.toLowerCase().includes('painter flexi'))) {
@@ -6499,6 +6504,7 @@ const shouldShowMed = () => {
                                     const years = (assetHKD && disposableMonthly) ? (assetHKD / (disposableMonthly * 12)) : 0;
                                     const holder = policyData.appType === 'Trust' ? 'Settlor' : 'Policyholder';
                                     const ageStr = policyData.phAge !== undefined ? policyData.phAge : '';
+                                    const ageNum = Number(ageStr) || 0;
                                     return (
                                         <div className="pl-4 mt-2 space-y-1">
                                             <div>{(() => {
@@ -6534,7 +6540,7 @@ const shouldShowMed = () => {
                                             {policyData.fnaSow && policyData.fnaSow.length ? <div>SoW: {policyData.fnaSow.join(', ')}</div> : null}
                                             {assetHKD && disposableMonthly ? <div>Assets take approx {years.toFixed(1)} years of disposable income to accumulate</div> : null}
                                             {assetHKD ? <div>=> SoF and SoW appears to be commensurate with {holder}’s background and no suspicions are found.</div> : null}
-                                            {assetHKD ? <div>Considering the {holder}’s age ({ageStr}) and the occupation, it is reasonable to save the asset of {formatHKDSign(assetHKD)} => Suggest accepting AML.</div> : null}
+                                            {assetHKD ? <div>{(ageNum && years > ageNum) ? `Considering the ${holder}’s age (${ageStr}) and the occupation, it is NOT reasonable to save the asset of ${formatHKDSign(assetHKD)}.` : `Considering the ${holder}’s age (${ageStr}) and the occupation, it is reasonable to save the asset of ${formatHKDSign(assetHKD)} => Suggest accepting AML.`}</div> : null}
                                         </div>
                                     );
                                 })()}
@@ -6889,9 +6895,25 @@ const shouldShowMed = () => {
         
         /* ========= Versioning & Update Log ========= */
         // Updated version constant to reflect latest enhancements
-        const CURRENT_VERSION = "v2.8.6";
+        const CURRENT_VERSION = "v2.8.623";
         const UPDATE_LOG_PASSWORD = "admin123";
         const versionHistory = [
+{
+    version: "v2.8.623",
+    date: "29 Jan 2026",
+    type: "Hotfix",
+    changes: [
+        "Fixed duplicate ageNum declaration causing in-browser Babel syntax error."
+    ]
+},
+{
+    version: "v2.8.62",
+    date: "28 Jan 2026",
+    type: "Patch Update",
+    changes: [
+        "Case Summary: If assets take approx. years exceeds Policyholder’s age, show 'NOT reasonable to save the asset' and hide AML suggestion."
+    ]
+},
 {
     version: "v2.8.6",
     date: "22 Jan 2026",
